@@ -52,18 +52,35 @@ def experience():
 
     return jsonify({})
 
-@app.route('/resume/education', methods=['GET', 'POST'])
-def education():
+@app.route('/resume/education/<index>', methods=['GET', 'POST'])
+def education(index):
     '''
     Handles education requests
     '''
-    if request.method == 'GET':
-        return jsonify({})
+    education2 = Education("Computer Science", "Harvard", "10-05-2019", "10-05-2024", "B", "Go Engineer")
+
+    education3 = Education("Cybersecurity", "University of florida", "08-05-2016", "10-05-2022", "A", "Hackers")    
+
+    if request.method == 'GET' and index == "1":
+        return jsonify(data["education"])
+    elif request.method == 'GET' and index == "2":        
+        return jsonify(education2)   
+    elif request.method == 'GET' and index == "3":        
+        return jsonify(3)   
+         
 
     if request.method == 'POST':
         return jsonify({})
 
     return jsonify({})
+
+    # if request.method == 'GET':
+    #     return jsonify({})
+
+    # if request.method == 'POST':
+    #     return jsonify({})
+
+    # return jsonify({})
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
