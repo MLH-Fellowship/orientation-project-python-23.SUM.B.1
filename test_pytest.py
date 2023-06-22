@@ -111,9 +111,3 @@ def test_add_skill():
     })
     print(response.json)
     assert response.status_code == 201
-
-if __name__ == '__main__':
-    test_add_experience()
-    test_add_education()
-    test_add_skill()
-    print("Everything passed")
