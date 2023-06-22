@@ -23,7 +23,20 @@ data = {
                   "September 2019",
                   "July 2022",
                   "80%",
-                  "example-logo.png")
+                  "example-logo.png"),
+        Education("Computer Science", 
+                  "Harvard", 
+                  "October 2019", 
+                  "June 2024", 
+                  "70%", 
+                  "example-logo.png"),
+        Education("Cybersecurity", 
+                  "University of florida", 
+                  "August 2016", 
+                  "January 2022", 
+                  "90%", 
+                  "example-logo.png")            
+
     ],
     "skill": [
         Skill("Python",
@@ -63,14 +76,18 @@ def experience():
         return jsonify({}), 201
     return jsonify({})
 
-@app.route('/resume/education', methods=['GET', 'POST'])
-def education():
+@app.route('/resume/education/<index>', methods=['GET', 'POST'])
+def education(index):
     '''
     Handles education requests
-    '''
-    if request.method == 'GET':
-        return jsonify({})
-
+    '''  
+    if request.method == 'GET' and index.isnumeric():        
+        index_num = int(index)
+        if index_num > 0 and index_num <= len(data["education"]):
+            return jsonify(data["education"][index_num - 1])
+        else:
+            return jsonify("Error: Not correct education index")  
+    
     if request.method == 'POST':
         # Request validation Start
         body = request.json
@@ -85,8 +102,15 @@ def education():
             return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
         # Request validation End
         return jsonify({}), 201
+       
+    return jsonify("Error: Not correct education index")  
 
-    return jsonify({})
+@app.route('/resume/education', methods=["GET"])
+def all_education():
+    '''Return all education in a list format'''
+    
+    if request.method == "GET":                                             
+        return data["education"]
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
