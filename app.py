@@ -70,16 +70,17 @@ def education(index):
     '''
     Handles education requests
     '''  
-    if request.method == 'GET' and index.isnumeric():
+    if request.method == 'GET' and index.isnumeric():        
         index_num = int(index)
         if index_num > 0 and index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
         else:
-            return jsonify("Error: Not an education")           
-
+            return jsonify("Error: Not correct education index")  
+    
     if request.method == 'POST':
-        return jsonify({})
- 
+        return jsonify({}) 
+       
+    return jsonify("Error: Not correct education index")  
 
 
 @app.route('/resume/education', methods=["GET"])
