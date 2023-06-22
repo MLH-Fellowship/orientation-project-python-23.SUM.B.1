@@ -103,3 +103,15 @@ def skill():
         return jsonify({})
 
     return jsonify({})
+
+
+@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
+def a_skill(index):
+    '''Return a single skill based on its index'''
+    if request.method == 'GET':
+        id = int(index)
+        if id > 0 and id <= len(data["skill"]):
+            return jsonify(data['skill'][id - 1])
+        else:
+            return jsonify({'message':'Skill with ID {id} does not exist'.format(id=id)})
+    
