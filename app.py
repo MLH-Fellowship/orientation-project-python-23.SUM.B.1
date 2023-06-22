@@ -97,12 +97,32 @@ def skill():
     Handles Skill requests
     '''
     if request.method == 'GET':
-        return data['skill']
+        return data['skill'], 200
 
     if request.method == 'POST':
-        return jsonify({})
+        # handle POST request by adding skill to data dictionary
+        body = request.json
+        required_fields = ['name', 'proficiency', 'logo']
 
-    return jsonify({})
+        # validate that the body fields has all required fields
+        if all(field in body for field in required_fields):
+            skill = Skill(body['name'], body['proficiency'], body['logo'])
+
+            data['skill'].append(skill) # add to list
+            index = data['skill'].index(skill)
+
+            return jsonify({
+            'message': 'Skill created successfully',
+            'index':index,
+            'body': skill
+        }), 201
+        else:
+            return jsonify({
+            'error': 'Missing required fields in the request body'
+        }), 400
+       
+
+    return jsonify({'message':'Something went wrong'}), 500
 
 
 @app.route('/resume/skill/<index>', methods=['GET', 'POST'])
@@ -111,7 +131,7 @@ def a_skill(index):
     if request.method == 'GET':
         id = int(index)
         if id > 0 and id <= len(data["skill"]):
-            return jsonify(data['skill'][id - 1])
+            return jsonify(data['skill'][id - 1]), 200
         else:
-            return jsonify({'message':'Skill with ID {id} does not exist'.format(id=id)})
+            return jsonify({'message':'Skill with ID {id} does not exist'.format(id=id)}), 400
     
