@@ -66,21 +66,12 @@ def education(index):
     elif request.method == 'GET' and index == "2":        
         return jsonify(education2)   
     elif request.method == 'GET' and index == "3":        
-        return jsonify(3)   
-         
+        return jsonify(3)           
 
     if request.method == 'POST':
         return jsonify({})
 
     return jsonify({})
-
-    # if request.method == 'GET':
-    #     return jsonify({})
-
-    # if request.method == 'POST':
-    #     return jsonify({})
-
-    # return jsonify({})
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
