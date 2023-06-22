@@ -21,7 +21,20 @@ data = {
                   "September 2019",
                   "July 2022",
                   "80%",
-                  "example-logo.png")
+                  "example-logo.png"),
+        Education("Computer Science", 
+                  "Harvard", 
+                  "October 2019", 
+                  "June 2024", 
+                  "70%", 
+                  "example-logo.png"),
+        Education("Cybersecurity", 
+                  "University of florida", 
+                  "August 2016", 
+                  "January 2022", 
+                  "90%", 
+                  "example-logo.png")            
+
     ],
     "skill": [
         Skill("Python",
@@ -56,22 +69,26 @@ def experience():
 def education(index):
     '''
     Handles education requests
-    '''
-    education2 = Education("Computer Science", "Harvard", "10-05-2019", "10-05-2024", "B", "Go Engineer")
-
-    education3 = Education("Cybersecurity", "University of florida", "08-05-2016", "10-05-2022", "A", "Hackers")    
-
+    '''  
     if request.method == 'GET' and index == "1":
-        return jsonify(data["education"])
+        return jsonify(data["education"][0])
     elif request.method == 'GET' and index == "2":        
-        return jsonify(education2)   
+        return jsonify(data["education"][1]) 
     elif request.method == 'GET' and index == "3":        
-        return jsonify(education3)           
+        return jsonify(data["education"][2])        
 
     if request.method == 'POST':
         return jsonify({})
 
     return jsonify({})
+
+
+@app.route('/resume/education', methods=["GET"])
+def all_education():
+    '''Return all education in a list format'''
+    
+    if request.method == "GET":                                             
+        return data["education"]
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
