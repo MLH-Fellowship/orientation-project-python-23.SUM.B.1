@@ -78,6 +78,15 @@ from app import app
 Makes request to add a new experience and checks if the received payload have all required fileds with valid formats
 '''
 def test_add_experience():
+    '''
+    Sends a POST request to add a new experience.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the response status code is not 201.
+    '''
     response = app.test_client().post('/resume/experience', json={
         "title": "Software Developer",
         "company": "A Cool Company",
@@ -91,6 +100,15 @@ def test_add_experience():
     
     
 def test_add_education():
+    '''
+    Sends a POST request to add a new education.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the response status code is not 201.
+    '''
     response = app.test_client().post('/resume/education', json={
         "course": "Computer Science",
         "school": "University of Tech",
@@ -104,6 +122,15 @@ def test_add_education():
 
 
 def test_add_skill():
+    '''
+    Sends a POST request to add a new skill.
+
+    Returns:
+        None
+
+    Raises:
+        AssertionError: If the response status code is not 201.
+    '''
     response = app.test_client().post('/resume/skill', json={
         "name": "Python",
         "proficiency": "15%",

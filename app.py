@@ -49,7 +49,10 @@ data = {
 @app.route('/test')
 def hello_world():
     '''
-    Returns a JSON test message
+    Returns a JSON test message.
+
+    Returns:
+        A JSON response with a test message.
     '''
     return jsonify({"message": "Hello, World!"})
 
@@ -57,7 +60,16 @@ def hello_world():
 @app.route('/resume/experience', methods=['GET', 'POST'])
 def experience():
     '''
-    Handle experience requests
+    Handles experience requests.
+
+    GET:
+        Returns an empty JSON response.
+
+    POST:
+        Creates a new experience entry based on the provided data.
+
+        Returns:
+            A JSON response indicating the status of the operation.
     '''
     if request.method == 'GET':
         return jsonify()
@@ -79,7 +91,25 @@ def experience():
 @app.route('/resume/education/<index>', methods=['GET', 'POST'])
 def education(index):
     '''
-    Handles education requests
+    Handles education requests.
+
+    GET:
+        Retrieves the education entry at the specified index.
+
+        Parameters:
+            index (str): The index of the education entry.
+
+        Returns:
+            A JSON response containing the education entry.
+
+    POST:
+        Creates a new education entry based on the provided data.
+
+        Parameters:
+            index (str): The index of the education entry.
+
+        Returns:
+            A JSON response indicating the status of the operation.
     '''  
     if request.method == 'GET' and index.isnumeric():        
         index_num = int(index)
@@ -107,7 +137,12 @@ def education(index):
 
 @app.route('/resume/education', methods=["GET"])
 def all_education():
-    '''Return all education in a list format'''
+    '''
+    Returns all education entries in a list format.
+
+    Returns:
+        A JSON response containing all education entries.
+    '''
     
     if request.method == "GET":                                             
         return data["education"]
@@ -116,7 +151,16 @@ def all_education():
 @app.route('/resume/skill', methods=['GET', 'POST'])
 def skill():
     '''
-    Handles Skill requests
+    Handles skill requests.
+
+    GET:
+        Returns an empty JSON response.
+
+    POST:
+        Creates a new skill entry based on the provided data.
+
+        Returns:
+            A JSON response indicating the status of the operation.
     '''
     if request.method == 'GET':
         return jsonify({})
