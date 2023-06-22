@@ -106,7 +106,7 @@ def test_add_education():
 def test_add_skill():
     response = app.test_client().post('/resume/skill', json={
         "name": "Python",
-        "experience": "15%",
+        "proficiency": "15%",
         "logo": "example-logo.png"
     })
     print(response.json)
