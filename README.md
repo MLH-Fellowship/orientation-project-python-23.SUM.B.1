@@ -1,6 +1,9 @@
 # Orientation Project - Python
 
 [![linting: pylint](https://img.shields.io/badge/linting-pylint-yellowgreen)](https://github.com/PyCQA/pylint)
+[![Pylint](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pylint.yml/badge.svg)](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pylint.yml)
+[![Pyright](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pyright.yml/badge.svg)](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pyright.yml)
+[![Pytest](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pytest.yml/badge.svg)](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/actions/workflows/pytest.yml)
 
 Refer to the Fellowship LMS for information!
 
