@@ -65,30 +65,27 @@ def experience():
 
     return jsonify({})
 
+@app.route('/resume/education', methods=['GET', 'POST'])
 @app.route('/resume/education/<index>', methods=['GET', 'POST'])
-def education(index):
-    '''
-    Handles education requests
-    '''  
-    if request.method == 'GET' and index.isnumeric():        
+def education(index=None):
+    """ Return a education based on index, return all educations in the list,"""
+      
+    if request.method == 'GET' and index is None:
+        return jsonify(data["education"]) 
+    elif request.method == 'GET' and index.isnumeric():        
         index_num = int(index)
         if index_num > 0 and index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
         else:
-            return jsonify("Error: Not correct education index")  
-    
+            return jsonify("Error: There is no education related to this index")   
+
+
     if request.method == 'POST':
         return jsonify({}) 
-       
-    return jsonify("Error: Not correct education index")  
 
 
-@app.route('/resume/education', methods=["GET"])
-def all_education():
-    '''Return all education in a list format'''
-    
-    if request.method == "GET":                                             
-        return data["education"]
+    return jsonify("Error: This education id does not exist.")  
+
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
