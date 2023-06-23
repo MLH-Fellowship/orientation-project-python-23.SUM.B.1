@@ -114,20 +114,43 @@ def all_education():
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
-def skill():
+@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
+def skill(index=None):
     '''
     Handles Skill requests
     '''
     if request.method == 'GET':
-        return jsonify({})
+        if index:
+            # if user is trying to access a specific skill with id=index
+            id = int(index)
+            if id > 0 and id <= len(data['skill']):
+                return jsonify(data['skill'][id - 1]), 200
+            else:
+                return jsonify({'message': f'Skill with ID {id} does not exist'}), 400
+        else:
+            return jsonify(data['skill']), 200
 
     if request.method == 'POST':
+        # handle POST request by adding skill to data dictionary
         body = request.json
         required_fields = ['name', 'proficiency', 'logo']
+        
+        # validate that the body fields has all required fields and proficiency validation
         if(body.get('proficiency') and not validate_proficiency(body.get('proficiency'))):
             return jsonify({"error": "Invalid proficiency format.Format should look like 82%"}), 400
         if not validate_request(body, required_fields):
             return jsonify({"error": "Invalid request payload. Attributes are missing"}), 400
-        return jsonify({}), 201
+        else:
+            skill = Skill(body['name'], body['proficiency'], body['logo'])
 
-    return jsonify({})
+            data['skill'].append(skill) # add to list
+            index = data['skill'].index(skill)
+
+            return jsonify({
+            'id': index,
+            'message': 'Skill created successfully',
+            'body':  data['skill']
+        }), 201
+
+    return jsonify({'message':'Something went wrong'}), 500
+    
