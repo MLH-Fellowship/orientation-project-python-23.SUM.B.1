@@ -124,9 +124,7 @@ def skill(index=None):
             # if user is trying to access a specific skill with id=index
             id = int(index)
             if id > 0 and id <= len(data['skill']):
-                return jsonify({
-                    data['skill'][id - 1]
-                    }), 200
+                return jsonify(data['skill'][id - 1]), 200
             else:
                 return jsonify({'message': f'Skill with ID {id} does not exist'}), 400
         else:
