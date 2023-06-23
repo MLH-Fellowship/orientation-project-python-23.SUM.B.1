@@ -120,10 +120,10 @@ def skill(index=None):
     '''
     if request.method == 'GET':
         if index:
-            # if user is trying to access a specific skill with id=index
+            # if user is trying to access a specific skill with skill_id=index
             skill_id = int(index)
             if (skill_id > 0 and skill_id <= len(data['skill'])):
-                return jsonify(data['skill'][id - 1]), 200
+                return jsonify(data['skill'][skill_id - 1]), 200
             else:
                 return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
         else:
@@ -153,7 +153,7 @@ def skill(index=None):
     if request.method == 'DELETE':
         # handle delete requests
         if index:
-            # if user is trying to access a specific skill with id=index
+            # if user is trying to access a specific skill with skill_id=index
             skill_id = int(index)
             if (skill_id > 0 and skill_id <= len(data['skill'])):
                 # remove (skill_id - 1) from the list
