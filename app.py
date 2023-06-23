@@ -92,12 +92,23 @@ def all_education():
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
-def skill():
+@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
+def skill(index=None):
     '''
     Handles Skill requests
     '''
     if request.method == 'GET':
-        return data['skill'], 200
+        if index:
+            # if user is trying to access a specific skill with id=index
+            id = int(index)
+            if id > 0 and id <= len(data['skill']):
+                return jsonify({
+                    data['skill'][id - 1]
+                    }), 200
+            else:
+                return jsonify({'message': f'Skill with ID {id} does not exist'}), 400
+        else:
+            return jsonify(data['skill']), 200
 
     if request.method == 'POST':
         # handle POST request by adding skill to data dictionary
@@ -112,26 +123,14 @@ def skill():
             index = data['skill'].index(skill)
 
             return jsonify({
+            'id': index,
             'message': 'Skill created successfully',
-            'index':index,
-            'body': skill
+            'body':  data['skill']
         }), 201
         else:
             return jsonify({
             'error': 'Missing required fields in the request body'
         }), 400
        
-
     return jsonify({'message':'Something went wrong'}), 500
-
-
-@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
-def a_skill(index):
-    '''Return a single skill based on its index'''
-    if request.method == 'GET':
-        id = int(index)
-        if id > 0 and id <= len(data["skill"]):
-            return jsonify(data['skill'][id - 1]), 200
-        else:
-            return jsonify({'message':'Skill with ID {id} does not exist'.format(id=id)}), 400
     
