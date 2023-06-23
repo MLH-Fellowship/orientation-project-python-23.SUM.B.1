@@ -116,18 +116,23 @@ def all_education():
 @app.route('/resume/skill/<index>', methods=['GET', 'POST', 'DELETE'])
 def skill(index=None):
     '''
-    Handles Skill requests
+    Handles Skill requests.
+
+    Parameters:
+        index (int): Index of the skill to access or delete (optional).
+
+    Returns:
+        Flask Response: JSON response containing skill information or an error message.
+
     '''
     if request.method == 'GET':
         if index:
             # if user is trying to access a specific skill with skill_id=index
             skill_id = int(index)
-            if (skill_id > 0 and skill_id <= len(data['skill'])):
+            if skill_id > 0 and skill_id <= len(data['skill']):
                 return jsonify(data['skill'][skill_id - 1]), 200
-            else:
-                return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
-        else:
-            return jsonify(data['skill']), 200
+            return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
+        return jsonify(data['skill']), 200
 
     if request.method == 'POST':
         # handle POST request by adding skill to data dictionary
@@ -138,29 +143,27 @@ def skill(index=None):
             return jsonify({"error": "Invalid proficiency format.Format should look like 82%"}), 400
         if not validate_request(body, required_fields):
             return jsonify({"error": "Invalid request payload. Attributes are missing"}), 400
-        else:
-            a_skill = Skill(body['name'], body['proficiency'], body['logo'])
+        a_skill = Skill(body['name'], body['proficiency'], body['logo'])
 
-            data['skill'].append(a_skill) # add to list
-            index = data['skill'].index(a_skill)
+        data['skill'].append(a_skill) # add to list
+        index = data['skill'].index(a_skill)
 
-            return jsonify({
-            'id': index,
-            'message': 'Skill created successfully',
-            'body':  data['skill']
-        }), 201
+        return jsonify({
+        'id': index,
+        'message': 'Skill created successfully',
+        'body':  data['skill']
+    }), 201
 
     if request.method == 'DELETE':
         # handle delete requests
         if index:
             # if user is trying to access a specific skill with skill_id=index
             skill_id = int(index)
-            if (skill_id > 0 and skill_id <= len(data['skill'])):
+            if skill_id > 0 and skill_id <= len(data['skill']):
                 # remove (skill_id - 1) from the list
                 # if the user passes 1 to the url, then they want to remove the first skill record
                 deleted_item = data['skill'].pop((skill_id - 1))
                 return jsonify({'status':'success', 'message': 'Skill deleted successfully','deleted_item':deleted_item}), 200
             return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
-
 
     return jsonify({'message':'Something went wrong'}), 500

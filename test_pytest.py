@@ -146,7 +146,7 @@ def test_delete_skill():
 
     # Assert the response payload contains the expected fields
     assert "status" in response.json
-    assert "message" in response.json 
+    assert "message" in response.json
     assert "deleted_item" in response.json
 
     # Assert the response payload has the correct values
