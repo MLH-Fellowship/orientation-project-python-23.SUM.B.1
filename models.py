@@ -68,3 +68,21 @@ class Skill:
     name: str
     proficiency: str
     logo: str
+
+@dataclass
+class User:
+    """
+    Summary
+    -------
+    dataclass for user schema
+
+    Attributes
+    ----------
+    name (str): user name
+    phone (str): user phone
+    email (str): user email
+    """
+
+    name: str
+    phone: str
+    email: str

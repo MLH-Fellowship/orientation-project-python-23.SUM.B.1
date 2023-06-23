@@ -1,10 +1,12 @@
 '''
 Flask Application
 '''
+import phonenumbers
 from flask import Flask, jsonify, request
-from models import Experience, Education, Skill
-from utils import validate_date_string, validate_grade, validate_proficiency, validate_request
 
+from models import Education, Experience, Skill, User
+from utils import (validate_date_string, validate_grade, validate_proficiency,
+                   validate_request)
 
 app = Flask(__name__)
 # Validation of required fields
@@ -42,7 +44,10 @@ data = {
         Skill("Python",
               "1-2 Years",
               "example-logo.png")
-    ]
+    ],
+    "user":[
+        
+    ],
 }
 
 
@@ -102,7 +107,7 @@ def education(index):
             return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
         # Request validation End
         return jsonify({}), 201
-       
+   
     return jsonify("Error: Not correct education index")  
 
 @app.route('/resume/education', methods=["GET"])
@@ -111,7 +116,6 @@ def all_education():
     
     if request.method == "GET":                                             
         return data["education"]
-
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
 @app.route('/resume/skill/<index>', methods=['GET', 'POST'])
@@ -153,4 +157,102 @@ def skill(index=None):
         }), 201
 
     return jsonify({'message':'Something went wrong'}), 500
-    
+
+@app.route('/user', methods=['GET', 'POST'])
+@app.route('/user/<user_id>', methods=['PUT'])
+def user(user_id=None):
+    '''
+    Creates a new user.
+    Update a user
+
+    Parameters:
+        user_id (str): ID of the user to update.
+
+    Request Body:
+        {
+            "name": "John Doe",
+            "phone": "+1234567890",
+            "email": "johndoe@example.com"
+        }
+
+    Returns:
+        Flask Response: JSON response indicating success or failure.
+    '''
+    if request.method == 'GET':
+        return jsonify(data["user"]), 200
+
+    if request.method == 'PUT':
+        if user_id:
+            # if user is trying to access a specific skill with id=index
+            uid = int(user_id)
+            if 0 < uid <= len(data['user']):
+                body = request.json
+                required_fields = ['name', 'phone', 'email']
+
+                name = body['name']
+                phone = body['phone']
+                email = body['email']
+
+                if not validate_phone(phone):
+                    return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
+
+                    # update the user in the database.
+                    # for now, we fetch the current user based on ID - position in the array = (id - 1)
+
+                a_user = data['user'][uid - 1] # get user to update
+
+                # update their info
+                a_user.name = name
+                a_user.phone = phone
+                a_user.email = email
+
+
+                data['user'][uid - 1] = a_user # add to list
+                index = data['user'].index(a_user)
+
+                return jsonify({
+                    'id': index,
+                    'message': 'User updated successfully',
+                    'body': a_user,
+                }), 201
+
+        return jsonify({'message': f'User with ID {uid} does not exist'}), 400
+
+
+    if request.method == 'POST':
+        body = request.json
+        required_fields = ['name', 'phone', 'email']
+
+        # ensure that the body has all required params
+        if not validate_request(body, required_fields):
+            return jsonify({"error": "Invalid request payload. Required fields are missing."}), 400
+
+        name = body['name']
+        phone = body['phone']
+        email = body['email']
+
+        if not validate_phone(phone):
+            return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
+
+        # Create the user in the database.
+        # for now, we add it to a list
+        a_user = User(name=name, phone=phone, email=email)
+        data['user'].append(a_user) # add to list
+        index = data['user'].index(a_user)
+
+        return jsonify({
+            'message': 'User created successfully',
+            'body': a_user,
+        }), 201
+
+def validate_phone(phone):
+    """
+    Validate phone numbers. It ensures that the user is using an international phone number
+    """
+    try:
+        parsed_phone = phonenumbers.parse(phone, None)
+        if not phonenumbers.is_valid_number(parsed_phone):
+            return False
+        return True
+    except phonenumbers.NumberParseException:
+        return False

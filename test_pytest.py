@@ -124,3 +124,16 @@ def test_add_skill():
     )
     print(response.json)
     assert response.status_code == 201
+
+def test_create_user():
+    """
+    Summary
+    -------
+    makes request to add a new user and checks if the received payload have all required fileds with valid formats
+    """
+    response = app.test_client().post(
+        "/user",
+        json={"name": "Jon Doe", "phone": "+2349050337980", "email": "jondoe@example.com"},
+    )
+    print(response.json)
+    assert response.status_code == 201
