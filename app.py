@@ -4,6 +4,7 @@ Flask Application
 from flask import Flask, jsonify, request
 from models import Experience, Education, Skill
 
+
 app = Flask(__name__)
 
 data = {
@@ -65,6 +66,7 @@ def experience():
 
     return jsonify({})
 
+
 @app.route('/resume/education', methods=['GET', 'POST'])
 @app.route('/resume/education/<index>', methods=['GET', 'POST'])
 def education(index=None):
@@ -79,13 +81,16 @@ def education(index=None):
         else:
             return jsonify("Error: There is no education related to this index")   
 
-
     if request.method == 'POST':
-        return jsonify({}) 
-
-
+        new_education = request.json        
+        education_fields = {"course", "school", "start_date", "end_date", "grade", "logo"}           
+        if education_fields <= new_education.keys():
+            data['education'].append(new_education)
+            new_education_index = len(data["education"]) -1            
+            return jsonify({"id": new_education_index})             
+        else:
+            return jsonify("Not able to add new education, Check the fields and try again.") 
     return jsonify("Error: This education id does not exist.")  
-
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
