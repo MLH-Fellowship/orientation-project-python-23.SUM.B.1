@@ -1,8 +1,4 @@
-'''
-Tests in Pytest
-'''
 from app import app
-
 
 # def test_client():
 #     '''
@@ -15,8 +11,8 @@ from app import app
 
 # def test_experience():
 #     '''
-#     Add a new experience and then get all experiences. 
-    
+#     Add a new experience and then get all experiences.
+
 #     Check that it returns the new experience in that list
 #     '''
 #     example_experience = {
@@ -36,8 +32,8 @@ from app import app
 
 # def test_education():
 #     '''
-#     Add a new education and then get all educations. 
-    
+#     Add a new education and then get all educations.
+
 #     Check that it returns the new education in that list
 #     '''
 #     example_education = {
@@ -57,8 +53,8 @@ from app import app
 
 # def test_skill():
 #     '''
-#     Add a new skill and then get all skills. 
-    
+#     Add a new skill and then get all skills.
+
 #     Check that it returns the new skill in that list
 #     '''
 #     example_skill = {
@@ -74,40 +70,57 @@ from app import app
 #     assert response.json[item_id] == example_skill
 
 
-'''
-Makes request to add a new experience and checks if the received payload have all required fileds with valid formats
-'''
 def test_add_experience():
-    response = app.test_client().post('/resume/experience', json={
-        "title": "Software Developer",
-        "company": "A Cool Company",
-        "start_date": "June 2022",
-        "end_date": "October 2024",
-        "description": "Writing Python Code",
-        "logo": "example-logo.png"
-    })
+    """
+    Summary
+    -------
+    makes request to add a new experience and checks if the received payload have all required fileds with valid formats
+    """
+    response = app.test_client().post(
+        "/resume/experience",
+        json={
+            "title": "Software Developer",
+            "company": "A Cool Company",
+            "start_date": "June 2022",
+            "end_date": "October 2024",
+            "description": "Writing Python Code",
+            "logo": "example-logo.png",
+        },
+    )
     print(response.json)
     assert response.status_code == 201
-    
-    
+
+
 def test_add_education():
-    response = app.test_client().post('/resume/education', json={
-        "course": "Computer Science",
-        "school": "University of Tech",
-        "start_date": "September 2019",
-        "end_date": "July 2022",
-        "grade": "A+",
-        "logo": "example-logo.png"
-    })
+    """
+    Summary
+    -------
+    makes request to add a new education and checks if the received payload have all required fileds with valid formats
+    """
+    response = app.test_client().post(
+        "/resume/education",
+        json={
+            "course": "Computer Science",
+            "school": "University of Tech",
+            "start_date": "September 2019",
+            "end_date": "July 2022",
+            "grade": "A+",
+            "logo": "example-logo.png",
+        },
+    )
     print(response.json)
     assert response.status_code == 201
 
 
 def test_add_skill():
-    response = app.test_client().post('/resume/skill', json={
-        "name": "Python",
-        "proficiency": "15%",
-        "logo": "example-logo.png"
-    })
+    """
+    Summary
+    -------
+    makes request to add a new skill and checks if the received payload have all required fileds with valid formats
+    """
+    response = app.test_client().post(
+        "/resume/skill",
+        json={"name": "Python", "proficiency": "15%", "logo": "example-logo.png"},
+    )
     print(response.json)
     assert response.status_code == 201
