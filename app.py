@@ -117,14 +117,14 @@ def education(index=None):
 
         data['education'].append(body)
         new_education_index = len(data["education"]) -1
-        return jsonify({"id": new_education_index})
+        return jsonify({"id": new_education_index}), 201
 
     if request.method == 'DELETE':
         id = int(index)        
-        del data['education'][id - 1]   
-        return jsonify(f"Education successfully deleted.")      
+        deleted_education = data['education'].pop((id - 1))        
+        return jsonify({'message':f'Education {deleted_education.course} successfully deleted'})      
 
-    return jsonify("Error: Not correct education index") 
+    return jsonify({'message':"Error: Not correct education index"}) 
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])

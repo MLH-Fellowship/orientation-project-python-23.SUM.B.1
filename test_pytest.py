@@ -114,18 +114,8 @@ def test_add_education():
 def test_delete_education():
     """ Test deleting a education"""    
 
-    new_education = {
-        "course": "Software tester",
-        "school": "University Virginia",
-        "start_date": "March 2015",
-        "end_date": "July 2023",
-        "grade": "A+",
-        "logo": "example-logo.png",
-    }
-    education_id = app.test_client().post('/resume/education',json=new_education).json['id']
-
-    response = app.test_client().delete(f"/resume/education/{education_id}")
-    assert response.status_code == 200
+    result = app.test_client().delete('/resume/education/1').json['message']
+    assert result == "Education Computer Science successfully deleted"
 
 
 
