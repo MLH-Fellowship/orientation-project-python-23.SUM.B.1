@@ -125,6 +125,34 @@ def test_add_skill():
     print(response.json)
     assert response.status_code == 201
 
+def test_edit_skill():
+    """
+    Summary:
+    Makes a request to edit an existing skill and checks if the skill's information is updated correctly.
+    """
+    # Create a new user to edit for testing purposes
+    response = app.test_client().post(
+        "/resume/skill",
+        json={ "name":"Dro-Lang", "proficiency": "70%", "logo":"dro-logo.png"},
+    )
+    assert response.status_code == 201
+
+    # Get the user ID of the created user
+    skill_id = response.json["id"]
+
+    # Make a request to edit the user's information
+    response = app.test_client().put(
+        f"/resume/skill/{skill_id}",
+        json={ "name":"Golang", "proficiency": "10%", "logo":"Golang-logo.png"},
+    )
+    assert response.status_code == 201
+
+    # Check if the user's information is updated correctly
+    assert response.json["message"] == "Skill updated successfully"
+    assert response.json["body"]["name"] == "Golang"
+    assert response.json["body"]["proficiency"] == "10%"
+    assert response.json["body"]["logo"] == "Golang-logo.png"
+
 
 def test_delete_skill():
     """

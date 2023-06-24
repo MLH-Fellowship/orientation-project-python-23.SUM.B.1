@@ -123,7 +123,7 @@ def all_education():
         return data["education"]
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
-@app.route('/resume/skill/<index>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/resume/skill/<index>', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def skill(index=None):
     '''
     Handles Skill requests.
@@ -139,10 +139,44 @@ def skill(index=None):
         if index:
             # if user is trying to access a specific skill with skill_id=index
             skill_id = int(index)
-            if skill_id > 0 and skill_id <= len(data['skill']):
+            if 0 < skill_id <= len(data['skill']):
                 return jsonify(data['skill'][skill_id - 1]), 200
             return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
         return jsonify(data['skill']), 200
+
+    if request.method == 'PUT':
+        if index:
+            # if user is trying to access a specific skill with id=index
+            skill_id = int(index)
+            if 0 < skill_id <= len(data['skill']):
+                body = request.json
+                required_fields = ['name', 'proficiency', 'logo']
+
+                name = body['name']
+                proficiency = body['proficiency']
+                logo = body['logo']
+
+                    # update the skill in the database.
+                    # for now, we fetch the current user based on ID - position in the array = (id - 1)
+
+                a_skill = data['skill'][skill_id - 1] # get user to update
+
+                # update their info
+                a_skill.name = name
+                a_skill.proficiency = proficiency
+                a_skill.logo = logo
+
+
+                data['skill'][skill_id - 1] = a_skill # add to list
+                index = data['skill'].index(a_skill)
+
+                return jsonify({
+                    'id': index,
+                    'message': 'Skill updated successfully',
+                    'body': a_skill,
+                }), 201
+
+        return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
 
     if request.method == 'POST':
         # handle POST request by adding skill to data dictionary
@@ -156,10 +190,10 @@ def skill(index=None):
         a_skill = Skill(body['name'], body['proficiency'], body['logo'])
 
         data['skill'].append(a_skill) # add to list
-        index = data['skill'].index(a_skill)
+        index = len(data['skill']) - 1
 
         return jsonify({
-        'id': index,
+        'id': (index + 1),
         'message': 'Skill created successfully',
         'body':  data['skill']
     }), 201
@@ -258,7 +292,7 @@ def user(user_id=None):
         # for now, we add it to a list
         a_user = User(name=name, phone=phone, email=email)
         data['user'].append(a_user) # add to list
-        index = data['user'].index(a_user)
+        index = len(data['user']) - 1
 
         return jsonify({
             'message': 'User created successfully',
