@@ -44,9 +44,7 @@ data = {
         Skill("Python",
               "1-2 Years",
               "example-logo.png")],
-    "user":[
-        
-    ],
+    "user":[],
 }
 
 
@@ -66,9 +64,9 @@ def experience(index = None):
     if request.method == 'GET':
         if index:
             if str(index).isnumeric():
-                expId = int(index)
-                if 1 <= expId <= len(data['experience']):
-                    return jsonify(data['experience'][expId-1]), 200
+                exp_id = int(index)
+                if 1 <= exp_id <= len(data['experience']):
+                    return jsonify(data['experience'][exp_id-1]), 200
                 else:
                     return jsonify({"message": "Invalid experience ID"}), 400
             else:
@@ -116,7 +114,7 @@ def education(index):
             return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
         # Request validation End
         return jsonify({}), 201
-    return jsonify("Error: Not correct education index")  
+    return jsonify("Error: Not correct education index")
 
 @app.route('/resume/education', methods=["GET"])
 def all_education():
@@ -265,6 +263,7 @@ def user(user_id=None):
         return jsonify({
             'message': 'User created successfully',
             'body': a_user,
+            'id': (index + 1)
         }), 201
 
 def validate_phone(phone):

@@ -165,3 +165,32 @@ def test_create_user():
     )
     print(response.json)
     assert response.status_code == 201
+
+
+def test_edit_user():
+    """
+    Summary:
+    Makes a request to edit an existing user and checks if the user's information is updated correctly.
+    """
+    # Create a new user to edit for testing purposes
+    response = app.test_client().post(
+        "/user",
+        json={"name": "Altman Doe", "phone": "+12124567890", "email": "johndoe@example.com"},
+    )
+    assert response.status_code == 201
+
+    # Get the user ID of the created user
+    user_id = response.json["id"]
+
+    # Make a request to edit the user's information
+    response = app.test_client().put(
+        f"/user/{user_id}",
+        json={"name": "Jane Doe", "phone": "+12124567892", "email": "janedoe@example.com"},
+    )
+    assert response.status_code == 201
+
+    # Check if the user's information is updated correctly
+    assert response.json["message"] == "User updated successfully"
+    assert response.json["body"]["name"] == "Jane Doe"
+    assert response.json["body"]["phone"] == "+12124567892"
+    assert response.json["body"]["email"] == "janedoe@example.com"
