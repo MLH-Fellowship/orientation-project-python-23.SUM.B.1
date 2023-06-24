@@ -53,14 +53,24 @@ def hello_world():
     '''
     return jsonify({"message": "Hello, World!"})
 
-
 @app.route('/resume/experience', methods=['GET', 'POST'])
-def experience():
+@app.route('/resume/experience/<index>', methods=['GET', 'POST'])
+def experience(index = None):
     '''
     Handle experience requests
     '''
     if request.method == 'GET':
-        return jsonify()
+        if index:
+            if str(index).isnumeric():
+                expId = int(index)
+                if 1 <= expId <= len(data['experience']):
+                    return jsonify(data['experience'][expId-1]), 200
+                else:
+                    return jsonify({"message": "Invalid experience ID"}), 400
+            else:
+                return jsonify({"message": "Invalid experience ID"}), 400
+        else:
+            return jsonify(data['experience']), 200
 
     if request.method == 'POST':
          # Request validation Start
