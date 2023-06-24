@@ -124,3 +124,31 @@ def test_add_skill():
     )
     print(response.json)
     assert response.status_code == 201
+
+
+def test_delete_skill():
+    """
+    Test deleting a skill through the skill endpoint
+    """
+    # Add a new skill to the data list for testing
+    new_skill = {
+        "name": "Python",
+        "proficiency": "82%",
+        "logo": "example-logo.png"
+    }
+    item_id = app.test_client().post('/resume/skill',json=new_skill).json['id']
+
+    # Make a DELETE request to delete the skill
+    response = app.test_client().delete(f"/resume/skill/{item_id}")
+
+    # Assert the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    # Assert the response payload contains the expected fields
+    assert "status" in response.json
+    assert "message" in response.json
+    assert "deleted_item" in response.json
+
+    # Assert the response payload has the correct values
+    assert response.json["status"] == "success"
+    assert response.json["message"] == "Skill deleted successfully"
