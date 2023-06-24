@@ -88,10 +88,10 @@ def experience(index = None):
     return jsonify({})
 
 @app.route('/resume/education', methods=['GET', 'POST'])
-@app.route('/resume/education/<index>', methods=['GET', 'POST'])
+@app.route('/resume/education/<index>', methods=['GET', 'POST', 'DELETE'])
 def education(index=None):
     """ Return a education based on index, return all educations in the list and add new education to the the list"""
-      
+
     if request.method == 'GET' and index is None:
         return jsonify(data["education"]) 
     elif request.method == 'GET' and index.isnumeric():        
@@ -99,7 +99,7 @@ def education(index=None):
         if index_num > 0 and index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
         else:
-            return jsonify("Error: There is no education related to this index")  
+            return jsonify("Error: There is no education related to this index")
         
     if request.method == 'POST':
         # Request validation Start
@@ -118,8 +118,17 @@ def education(index=None):
         data['education'].append(body)
         new_education_index = len(data["education"]) -1
         return jsonify({"id": new_education_index})
-       
+
+    if request.method == 'DELETE':
+        id = int(index)        
+        del data['education'][id - 1]         
+
     return jsonify("Error: Not correct education index") 
+
+    #todo:
+    # Delete existing Education #9
+    # Using a DELETE request for the /resume/education route, delete an existing Education using its index position as an ID.
+    # As part of this, you should write a test in test_pytest.py to show it works.
 
 
 
