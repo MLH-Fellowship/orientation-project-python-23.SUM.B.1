@@ -111,6 +111,13 @@ def test_add_education():
     print(response.json)
     assert response.status_code == 201
 
+def test_delete_education():
+    """ Test deleting a education"""    
+
+    result = app.test_client().delete('/resume/education/1').json['message']
+    assert result == "Education Computer Science successfully deleted"
+
+
 
 def test_add_skill():
     """
