@@ -121,15 +121,10 @@ def education(index=None):
 
     if request.method == 'DELETE':
         id = int(index)        
-        del data['education'][id - 1]         
+        del data['education'][id - 1]   
+        return jsonify(f"Education successfully deleted.")      
 
     return jsonify("Error: Not correct education index") 
-
-    #todo:
-    # Delete existing Education #9
-    # Using a DELETE request for the /resume/education route, delete an existing Education using its index position as an ID.
-    # As part of this, you should write a test in test_pytest.py to show it works.
-
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
