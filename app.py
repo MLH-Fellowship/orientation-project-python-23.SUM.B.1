@@ -26,13 +26,13 @@ data = {
                   "July 2022",
                   "80%",
                   "example-logo.png"),
-        Education("Computer Science", 
+        Education("Computer Science",
                   "Harvard", 
                   "October 2019", 
                   "June 2024", 
                   "70%", 
                   "example-logo.png"),
-        Education("Cybersecurity", 
+        Education("Cybersecurity",
                   "University of florida", 
                   "August 2016", 
                   "January 2022", 
@@ -43,8 +43,7 @@ data = {
     "skill": [
         Skill("Python",
               "1-2 Years",
-              "example-logo.png")
-    ],
+              "example-logo.png")],
     "user":[
         
     ],
@@ -58,14 +57,24 @@ def hello_world():
     '''
     return jsonify({"message": "Hello, World!"})
 
-
 @app.route('/resume/experience', methods=['GET', 'POST'])
-def experience():
+@app.route('/resume/experience/<index>', methods=['GET', 'POST'])
+def experience(index = None):
     '''
     Handle experience requests
     '''
     if request.method == 'GET':
-        return jsonify()
+        if index:
+            if str(index).isnumeric():
+                expId = int(index)
+                if 1 <= expId <= len(data['experience']):
+                    return jsonify(data['experience'][expId-1]), 200
+                else:
+                    return jsonify({"message": "Invalid experience ID"}), 400
+            else:
+                return jsonify({"message": "Invalid experience ID"}), 400
+        else:
+            return jsonify(data['experience']), 200
 
     if request.method == 'POST':
          # Request validation Start
@@ -85,14 +94,14 @@ def experience():
 def education(index):
     '''
     Handles education requests
-    '''  
-    if request.method == 'GET' and index.isnumeric():        
+    '''
+    if request.method == 'GET' and index.isnumeric():
         index_num = int(index)
         if index_num > 0 and index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
         else:
-            return jsonify("Error: Not correct education index")  
-    
+            return jsonify("Error: Not correct education index")
+
     if request.method == 'POST':
         # Request validation Start
         body = request.json
@@ -107,54 +116,67 @@ def education(index):
             return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
         # Request validation End
         return jsonify({}), 201
-   
     return jsonify("Error: Not correct education index")  
 
 @app.route('/resume/education', methods=["GET"])
 def all_education():
     '''Return all education in a list format'''
-    
-    if request.method == "GET":                                             
+    if request.method == "GET":
         return data["education"]
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
-@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
+@app.route('/resume/skill/<index>', methods=['GET', 'POST', 'DELETE'])
 def skill(index=None):
     '''
-    Handles Skill requests
+    Handles Skill requests.
+
+    Parameters:
+        index (int): Index of the skill to access or delete (optional).
+
+    Returns:
+        Flask Response: JSON response containing skill information or an error message.
+
     '''
     if request.method == 'GET':
         if index:
-            # if user is trying to access a specific skill with id=index
-            id = int(index)
-            if id > 0 and id <= len(data['skill']):
-                return jsonify(data['skill'][id - 1]), 200
-            else:
-                return jsonify({'message': f'Skill with ID {id} does not exist'}), 400
-        else:
-            return jsonify(data['skill']), 200
+            # if user is trying to access a specific skill with skill_id=index
+            skill_id = int(index)
+            if skill_id > 0 and skill_id <= len(data['skill']):
+                return jsonify(data['skill'][skill_id - 1]), 200
+            return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
+        return jsonify(data['skill']), 200
 
     if request.method == 'POST':
         # handle POST request by adding skill to data dictionary
         body = request.json
         required_fields = ['name', 'proficiency', 'logo']
-        
         # validate that the body fields has all required fields and proficiency validation
         if(body.get('proficiency') and not validate_proficiency(body.get('proficiency'))):
             return jsonify({"error": "Invalid proficiency format.Format should look like 82%"}), 400
         if not validate_request(body, required_fields):
             return jsonify({"error": "Invalid request payload. Attributes are missing"}), 400
-        else:
-            skill = Skill(body['name'], body['proficiency'], body['logo'])
+        a_skill = Skill(body['name'], body['proficiency'], body['logo'])
 
-            data['skill'].append(skill) # add to list
-            index = data['skill'].index(skill)
+        data['skill'].append(a_skill) # add to list
+        index = data['skill'].index(a_skill)
 
-            return jsonify({
-            'id': index,
-            'message': 'Skill created successfully',
-            'body':  data['skill']
-        }), 201
+        return jsonify({
+        'id': index,
+        'message': 'Skill created successfully',
+        'body':  data['skill']
+    }), 201
+
+    if request.method == 'DELETE':
+        # handle delete requests
+        if index:
+            # if user is trying to access a specific skill with skill_id=index
+            skill_id = int(index)
+            if skill_id > 0 and skill_id <= len(data['skill']):
+                # remove (skill_id - 1) from the list
+                # if the user passes 1 to the url, then they want to remove the first skill record
+                deleted_item = data['skill'].pop((skill_id - 1))
+                return jsonify({'status':'success', 'message': 'Skill deleted successfully','deleted_item':deleted_item}), 200
+            return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
 
     return jsonify({'message':'Something went wrong'}), 500
 
