@@ -90,6 +90,15 @@ def test_add_experience():
     print(response.json)
     assert response.status_code == 201
 
+def test_delete_experience():
+    """ Test deleting a education"""    
+
+    response = app.test_client().delete('/resume/experience/1')
+     # Assert the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    assert response.json["message"] == "Experience with ID 1 has been successfully deleted"
+
 
 def test_add_education():
     """
