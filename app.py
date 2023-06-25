@@ -23,7 +23,7 @@ data = {
                   "University of Tech",
                   "September 2019",
                   "July 2022",
-                  "80%",
+                  "A+",
                   "example-logo.png"),
         Education("Computer Science",
                   "Harvard",
@@ -32,7 +32,13 @@ data = {
                   "70%",
                   "example-logo.png"),
         Education("Cybersecurity", "University of florida",   "August 2016",  "January 2022",      "90%",
-                  "example-logo.png")
+                  "example-logo.png"),
+        Education("Cybersecurity",
+                  "University of florida", 
+                  "August 2016", 
+                  "January 2022", 
+                  "C+", 
+                  "example-logo.png")            
 
     ],
     "skill": [
@@ -53,14 +59,24 @@ def hello_world():
     '''
     return jsonify({"message": "Hello, World!"})
 
-
 @app.route('/resume/experience', methods=['GET', 'POST'])
-def experience():
+@app.route('/resume/experience/<index>', methods=['GET', 'POST'])
+def experience(index = None):
     '''
     Handle experience requests
     '''
     if request.method == 'GET':
-        return jsonify()
+        if index:
+            if str(index).isnumeric():
+                exp_id = int(index)
+                if 1 <= exp_id <= len(data['experience']):
+                    return jsonify(data['experience'][exp_id-1]), 200
+                else:
+                    return jsonify({"message": "Invalid experience ID"}), 400
+            else:
+                return jsonify({"message": "Invalid experience ID"}), 400
+        else:
+            return jsonify(data['experience']), 200
 
     if request.method == 'POST':
         # Request validation Start
@@ -79,16 +95,19 @@ def experience():
     return jsonify({})
 
 
-@app.route('/resume/education/<index>', methods=['GET', 'POST'])
-def education(index):
-    '''
-    Handles education requests
-    '''
-    if request.method == 'GET' and index.isnumeric():
+@app.route('/resume/education', methods=['GET', 'POST'])
+@app.route('/resume/education/<index>', methods=['GET', 'POST', 'DELETE'])
+def education(index=None):
+    """ Return a education based on index, return all educations in the list and add new education to the the list"""
+
+    if request.method == 'GET' and index is None:
+        return jsonify(data["education"])
+    elif request.method == 'GET' and index.isnumeric():
         index_num = int(index)
         if 0 < index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
-        return jsonify("Error: Not correct education index")
+        else:
+            return jsonify("Error: There is no education related to this index")
     if request.method == 'POST':
          # Request validation Start
         if request.json is not None:
@@ -132,10 +151,17 @@ def all_education():
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])
-@app.route('/resume/skill/<index>', methods=['GET', 'POST'])
+@app.route('/resume/skill/<index>', methods=['GET', 'POST', 'DELETE'])
 def skill(index=None):
     '''
-    Handles Skill requests
+    Handles Skill requests.
+
+    Parameters:
+        index (int): Index of the skill to access or delete (optional).
+
+    Returns:
+        Flask Response: JSON response containing skill information or an error message.
+
     '''
     if request.method == 'GET':
         if index:
@@ -171,5 +197,4 @@ def skill(index=None):
                 'message': 'Skill created successfully',
                 'body':  data['skill']
             }), 201
-
     return jsonify({'message': 'Something went wrong'}), 500
