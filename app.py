@@ -250,10 +250,10 @@ def user(user_id=None):
                 body = request.json
                 required_fields = ['name', 'phone', 'email', 'resume_order']
 
-                name = body['name']
-                phone = body['phone']
-                email = body['email']
-                resume_order = body['resume_order']
+                name = str(body['name'])
+                phone = str(body['phone'])
+                email = str(body['email'])
+                resume_order = str(body['resume_order'])
 
                 if not validate_phone(phone):
                     return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
@@ -290,10 +290,10 @@ def user(user_id=None):
         if not validate_request(body, required_fields):
             return jsonify({"error": "Invalid request payload. Required fields are missing."}), 400
 
-        name = body['name']
-        phone = body['phone']
-        email = body['email']
-        resume_order = body['resume_order']
+        name = str(body['name'])
+        phone = str(body['phone'])
+        email = str(body['email'])
+        resume_order = str(body['resume_order'])
 
         if not validate_phone(phone):
             return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
