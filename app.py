@@ -87,7 +87,23 @@ def experience(index = None):
         if not validate_request(body, required_fields):
             return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
         # Request validation End
-        return jsonify({}), 201
+
+        # Extract the required attributes from the data
+        title = body.get('title')
+        company = body.get('company')
+        start_date = body.get('start_date')
+        end_date = body.get('end_date')
+        description = body.get('description')
+        logo = body.get('logo')
+
+        # Create a new instance of the Experience class
+        new_experience = Experience(title, company, start_date, end_date, description, logo)
+        
+        data['experience'].append(new_experience)
+        return jsonify({
+            "message": "New experience successfully created",
+            "id": len(data['experience']) -1
+            }), 201
     return jsonify({})
 
 @app.route('/resume/education', methods=['GET', 'POST'])
