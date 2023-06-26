@@ -2,9 +2,9 @@ name: Pytest
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main", "workflows-fixes"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main", "workflows-fixes"]
 
 jobs:
   test:
