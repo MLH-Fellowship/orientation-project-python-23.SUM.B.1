@@ -16,6 +16,10 @@ skill_table = """CREATE TABLE IF NOT EXISTS
                 skill (name TEXT, proficiency TEXT, logo TEXT)"""
 cursor.execute(skill_table)
 
+user_table = """CREATE TABLE IF NOT EXISTS
+                user (name TEXT, phone TEXT, email TEXT, resume_order BLOB)"""
+cursor.execute(user_table)
+
 
 #adding data do tables
 cursor.execute("""INSERT INTO experience VALUES ("Software Developer",
@@ -35,9 +39,16 @@ cursor.execute("""INSERT INTO education VALUES ("Computer Science",
             )
 
 cursor.execute("""INSERT INTO skill VALUES ("Python",
-              "1-2 Years",
-              "example-logo.png")"""
+                "1-2 Years",
+                "example-logo.png")"""
             )    
+
+cursor.execute("""INSERT INTO user VALUES ("Andrew Friday", 
+                "+17276598653", 
+                "andrewf@gmail.com", 
+                "[1,2,3]")"""
+            )
+
 
 
 connection.commit()
