@@ -129,7 +129,7 @@ def experience(index = None):
             else:
                 return jsonify({"error": f"Experience with id {exp_id} not found"}), 404
         else:
-            return jsonify({"error": "Invalid experience ID"}), 404   
+            return jsonify({"error": "Invalid experience ID"}), 400
 
     return jsonify({})
 
