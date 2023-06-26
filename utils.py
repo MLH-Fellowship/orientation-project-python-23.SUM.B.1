@@ -110,3 +110,17 @@ def validate_grade(grade: str) -> bool:
         "D-",
         "F",
     ]
+
+
+def validate_education(body):
+    """ Return if education object is valid and if it's not what response and error code should be returned"""
+    required_fields = ['course', 'school', 'start_date', 'grade', 'logo']
+    if(body.get('grade') and not validate_grade(body.get('grade'))):
+        return False, jsonify({"error": "Invalid grade. The grade should be like A+ or F"}), 400
+    if body.get('start_date') and not validate_date_string(body.get('start_date')):
+        return False, jsonify({"error": "Invalid start date. Format should be `June 2023`"}), 400
+    if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
+        return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
+    if not validate_request(body, required_fields):
+        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400    
+    return True, None, None
