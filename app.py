@@ -44,7 +44,9 @@ data = {
         Skill("Python",
               "1-2 Years",
               "example-logo.png")],
-    "user":[],
+    "user":[
+        User(name='Akin Friday', phone='+2348050780750',email='akinfriday@example.com', resume_order='[1,2,3]')
+    ],
 }
 
 
@@ -246,11 +248,12 @@ def user(user_id=None):
             uid = int(user_id)
             if 0 < uid <= len(data['user']):
                 body = request.json
-                required_fields = ['name', 'phone', 'email']
+                required_fields = ['name', 'phone', 'email', 'resume_order']
 
                 name = body['name']
                 phone = body['phone']
                 email = body['email']
+                resume_order = body['resume_order']
 
                 if not validate_phone(phone):
                     return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
@@ -264,6 +267,7 @@ def user(user_id=None):
                 a_user.name = name
                 a_user.phone = phone
                 a_user.email = email
+                a_user.resume_order = resume_order
 
 
                 data['user'][uid - 1] = a_user # add to list
@@ -280,7 +284,7 @@ def user(user_id=None):
 
     if request.method == 'POST':
         body = request.json
-        required_fields = ['name', 'phone', 'email']
+        required_fields = ['name', 'phone', 'email', 'resume_order']
 
         # ensure that the body has all required params
         if not validate_request(body, required_fields):
@@ -289,13 +293,14 @@ def user(user_id=None):
         name = body['name']
         phone = body['phone']
         email = body['email']
+        resume_order = body['resume_order']
 
         if not validate_phone(phone):
             return jsonify({"error": "Invalid phone number. Please provide a valid international phone number."}), 400
 
         # Create the user in the database.
         # for now, we add it to a list
-        a_user = User(name=name, phone=phone, email=email)
+        a_user = User(name=name, phone=phone, email=email, resume_order=resume_order )
         data['user'].append(a_user) # add to list
         index = len(data['user']) - 1
 

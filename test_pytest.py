@@ -196,7 +196,7 @@ def test_create_user():
     """
     response = app.test_client().post(
         "/user",
-        json={"name": "Jon Doe", "phone": "+2349050337980", "email": "jondoe@example.com"},
+        json={"name": "Jon Doe", "phone": "+2349050337980", "email": "jondoe@example.com", "resume_order": "[1, 2, 3]"},
     )
     print(response.json)
     assert response.status_code == 201
@@ -210,7 +210,7 @@ def test_edit_user():
     # Create a new user to edit for testing purposes
     response = app.test_client().post(
         "/user",
-        json={"name": "Altman Doe", "phone": "+12124567890", "email": "johndoe@example.com"},
+        json={"name": "Altman Doe", "phone": "+12124567890", "email": "johndoe@example.com", "resume_order": "[1, 2, 3]"},
     )
     assert response.status_code == 201
 
@@ -220,7 +220,7 @@ def test_edit_user():
     # Make a request to edit the user's information
     response = app.test_client().put(
         f"/user/{user_id}",
-        json={"name": "Jane Doe", "phone": "+12124567892", "email": "janedoe@example.com"},
+        json={"name": "Jane Doe", "phone": "+12124567892", "email": "janedoe@example.com", "resume_order": "[2, 1, 3]"},
     )
     assert response.status_code == 201
 
@@ -229,3 +229,4 @@ def test_edit_user():
     assert response.json["body"]["name"] == "Jane Doe"
     assert response.json["body"]["phone"] == "+12124567892"
     assert response.json["body"]["email"] == "janedoe@example.com"
+    assert response.json["body"]["resume_order"] == "[2, 1, 3]"

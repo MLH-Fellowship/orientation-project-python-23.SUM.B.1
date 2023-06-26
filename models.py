@@ -81,8 +81,19 @@ class User:
     name (str): user name
     phone (str): user phone
     email (str): user email
+    resume_order (list): user resume order
+
+    where 1-> Experience, 2 -> Education,  3 -> Skills
+
+    Example: 
+    ```
+    # this means that we have a user with name Jon Doe, with other properties. The `resume_order` is used to specify that 
+    # this user wants their resume to be represented in a particular order: (Experience, Education, and Skill)
+    user = User(name='Jon Doe', phone'+2348050590740', email'jon.doe@example.com', resume_order = '[1, 2, 3]')
+    ```
     """
 
     name: str
     phone: str
     email: str
+    resume_order: str
