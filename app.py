@@ -111,7 +111,7 @@ def experience(index = None):
 @app.route('/resume/education', methods=['GET', 'POST'])
 @app.route('/resume/education/<index>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def education(index=None):
-    """ Return a education based on index, return all educations in the list and add new education to the the list"""    
+    """ Return an education based on index, return all educations in the list and add new education to the the list"""    
     if request.method == 'GET' and index is None:
         return jsonify(data["education"]) 
     elif request.method == 'GET' and index.isnumeric():        
