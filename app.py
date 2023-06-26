@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 
 from models import Education, Experience, Skill
 from utils import (validate_date_string, validate_grade, validate_proficiency,
-                   validate_request)
+                   validate_request, validate_education)
 
 app = Flask(__name__)
 # Validation of required fields
@@ -88,19 +88,6 @@ def experience(index = None):
     return jsonify({})
 
 
-def validate_education(body):
-    """ Return if education object is valid and if it's not what response and error code should be returned"""
-    required_fields = ['course', 'school', 'start_date', 'grade', 'logo']
-    if(body.get('grade') and not validate_grade(body.get('grade'))):
-        return False, jsonify({"error": "Invalid grade. The grade should be like A+ or F"}), 400
-    if body.get('start_date') and not validate_date_string(body.get('start_date')):
-        return False, jsonify({"error": "Invalid start date. Format should be `June 2023`"}), 400
-    if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-        return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
-    if not validate_request(body, required_fields):
-        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400    
-    return True, None, None
-
 
 @app.route('/resume/education', methods=['GET', 'POST'])
 @app.route('/resume/education/<index>', methods=['GET', 'POST', 'DELETE', 'PUT'])
@@ -135,18 +122,18 @@ def education(index=None):
                 return result_response, code 
             if id < len(data['education']):                                          
                 data['education'][id] = body                
-                return jsonify({'id': id + 1})    
+                return jsonify({'id': id + 1}), 200   
             else:                 
                 data['education'].append(body)
                 new_education_id = len(data["education"])
-                return jsonify({"id": new_education_id})    
+                return jsonify({"id": new_education_id}), 201   
 
     if request.method == 'DELETE':
         id = int(index)        
         deleted_education = data['education'].pop((id - 1))        
-        return jsonify({'message':f'Education {deleted_education.course} successfully deleted'})      
+        return jsonify({'message':f'Education {deleted_education.course} successfully deleted'})    
 
-    return jsonify({"message":"Error: Not correct education index"}) 
+    return jsonify({"message":"Error: Not correct education index"})
 
 
 @app.route('/resume/skill', methods=['GET', 'POST'])

@@ -50,7 +50,7 @@ flask run
 ### Run Tests
 
 ```bash
-t
+pytest test_pytest.py
 ```
 
 ### Run Linter
