@@ -102,7 +102,7 @@ def education(index=None):
 
     if request.method == 'GET' and index is None:
         return jsonify(data["education"])
-    elif request.method == 'GET' and index.isnumeric():
+    elif request.method == 'GET' and index is not None and index.isnumeric():
         index_num = int(index)
         if 0 < index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])

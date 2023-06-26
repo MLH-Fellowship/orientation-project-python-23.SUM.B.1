@@ -64,3 +64,6 @@ pylint *.py
 ```bash
 pyright
 ```
+
+### Contributors
+[![](https://contrib.rocks/image?repo=MLH-Fellowship/orientation-project-python-23.SUM.B.1)](https://github.com/MLH-Fellowship/orientation-project-python-23.SUM.B.1/graphs/contributors)
