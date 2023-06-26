@@ -116,7 +116,46 @@ def test_delete_education():
 
     result = app.test_client().delete('/resume/education/1').json['message']
     assert result == "Education Computer Science successfully deleted"
+    
 
+
+def test_edit_education():
+    """Test to check if put method to edit existent education works properly"""
+
+    response = app.test_client().put(
+        "/resume/education/1",
+        json={
+            "course": "Nurse",
+            "school": "University of Columbia",
+            "start_date": "January 2019",
+            "end_date": "december 2022",
+            "grade": "A+",
+            "logo": "example-logo.png",
+        },
+    )
+    result = response.json
+    assert result['id'] == 1
+    assert response.status_code == 200
+    
+   
+def test_add_education_via_put_request():
+    """Test to check if put method add existent education works properly"""
+
+    response = app.test_client().put(
+        "/resume/education/10",
+        json={
+            "course": "Nurse",
+            "school": "University of Columbia",
+            "start_date": "January 2019",
+            "end_date": "december 2022",
+            "grade": "A+",
+            "logo": "example-logo.png",
+        },
+    )
+    result = response.json
+    assert result['id'] == 4 
+    assert response.status_code == 201
+    
 
 
 def test_add_skill():
