@@ -2,12 +2,12 @@
 
 import json
 import os
-
 import crud
 import database_model
+from app import app
 
 
-database_model.connect_to_db(database_model.app_temporary, "resume")
+database_model.connect_to_db(app, "resume")
 database_model.db.drop_all()
 database_model.db.create_all()   #create database structure
 

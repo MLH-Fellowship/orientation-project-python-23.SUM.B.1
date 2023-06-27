@@ -1,8 +1,9 @@
+"""File to handle interactions to the database"""
+
 from database_model import db, User, Experience, Skill, Education
 import os
 import database_model
 import app
-
 
 
 

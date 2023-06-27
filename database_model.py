@@ -1,13 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
-
-
-app_temporary = Flask(__name__)
+from app import app
 
 
 db = SQLAlchemy()
-app_temporary.app_context().push()
+app.app_context().push()
 
 
 class User(db.Model):
@@ -41,7 +38,7 @@ class Skill(db.Model):
 
     def __repr__(self):
         return f'<Skill id={self.id} skill name={self.name} proficiency={self.proficiency}>'                     
-   
+  
 
 class Experience(db.Model):
     """A experience"""
@@ -79,10 +76,7 @@ class Education(db.Model):
 
     def __repr__(self):
         return f'Education id={self.id} course={self.course} school={self.school}>'            
-    
-
-
-
+ 
 def connect_to_db(app, db_name):
     """Connect flask service to the database."""
 
@@ -95,21 +89,5 @@ def connect_to_db(app, db_name):
     print("Connected to the db!")    
 
 if __name__ == "__main__":               #check if we run the file or import it
-    # from app import app    
-    connect_to_db(app_temporary, "resume")         #conncet the flask app to database    
-
-
-
-
-
-
-# def generate_skill(name, proficiency, logo):
-
-#     skill = Skill(name=name,
-#                   proficiency=proficiency,
-#                   logo=logo)
-#     # new_skill = crud.create_skill(name=name, proficiency=proficiency, logo=logo)
-#     db.session.add(skill)
-#     db.session.commit()
-#     print(skill)
-# generate_skill("Read", "Strong", "hahaha")
+  
+    connect_to_db(app, "resume")         #conncet the flask app to database    
