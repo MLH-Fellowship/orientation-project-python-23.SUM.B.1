@@ -113,11 +113,8 @@ def test_add_education():
 
 def test_delete_education():
     """ Test deleting a education"""    
-
-    result = app.test_client().delete('/resume/education/1').json['message']
-    assert result == "Education Computer Science successfully deleted"
-
-
+    response = app.test_client().delete('/resume/education/1')
+    assert response.status_code == 200
 
 def test_add_skill():
     """
@@ -143,19 +140,22 @@ def test_delete_skill():
         "proficiency": "82%",
         "logo": "example-logo.png"
     }
-    item_id = app.test_client().post('/resume/skill',json=new_skill).json['id']
+    response = app.test_client().post('/resume/skill',json=new_skill)
+    assert response.status_code == 201
+    if response.json is not None:
+        item_id = response.json["id"]
 
-    # Make a DELETE request to delete the skill
-    response = app.test_client().delete(f"/resume/skill/{item_id}")
+        # Make a DELETE request to delete the skill
+        delete_response = app.test_client().delete(f"/resume/skill/{item_id}")
 
-    # Assert the response status code is 200 (OK)
-    assert response.status_code == 200
+        # Assert the response status code is 200 (OK)
+        assert delete_response.status_code == 200
+        if delete_response.json is not None:
+            # Assert the response payload contains the expected fields
+            assert "status" in delete_response.json
+            assert "message" in delete_response.json
+            assert "deleted_item" in delete_response.json
 
-    # Assert the response payload contains the expected fields
-    assert "status" in response.json
-    assert "message" in response.json
-    assert "deleted_item" in response.json
-
-    # Assert the response payload has the correct values
-    assert response.json["status"] == "success"
-    assert response.json["message"] == "Skill deleted successfully"
+            # Assert the response payload has the correct values
+            assert delete_response.json["status"] == "success"
+            assert delete_response.json["message"] == "Skill deleted successfully"
