@@ -1,16 +1,14 @@
 """This file Loads data from json file and seed the tables"""
 
-import database_model
-import os
 import json
+import os
+
 import crud
 import database_model
 
-# import app
 
-os.system("dropdb resume")
-os.system("createdb resume")
 database_model.connect_to_db(database_model.app_temporary, "resume")
+database_model.db.drop_all()
 database_model.db.create_all()   #create database structure
 
 
@@ -71,5 +69,8 @@ for skill in skills:
     name = skill['name']
     proficiency = skill['proficiency']
     logo = skill['logo']
+
+    save_skill_to_db = crud.create_skill(name, proficiency, logo)
+    skill_list.append(save_skill_to_db)
 database_model.db.session.add_all(skill_list)    
 database_model.db.session.commit()
