@@ -1,5 +1,9 @@
+import pkg_resources
+
+from flask import jsonify
 from datetime import datetime
 from typing import Any
+from symspellpy import SymSpell
 
 
 def validate_date_string(date_string: str) -> bool:
@@ -112,6 +116,44 @@ def validate_grade(grade: str) -> bool:
     ]
 
 
+def check_for_suggestion(value:str) -> tuple[str, int]:
+    """
+    Check for spelling suggestions using SymSpell.
+
+    Args:
+        value: The input value to check for spelling suggestions.
+
+    Returns:
+        A tuple containing the suggested value and the number of corrections made.
+
+    Example:
+        check_for_suggestion("Hellq there")
+
+    """
+    sym_spell = SymSpell(max_dictionary_edit_distance=1, prefix_length=5)
+    dictionary_path = pkg_resources.resource_filename(
+        "symspellpy", "frequency_dictionary_en_82_765.txt"
+    )
+    bigram_path = pkg_resources.resource_filename(
+        "symspellpy", "frequency_bigramdictionary_en_243_342.txt"
+    )
+    # term_index is the column of the term and count_index is the
+    # column of the term frequency
+    sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
+    sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
+
+    results = sym_spell.lookup_compound(value, max_edit_distance=1, transfer_casing=True)
+
+    for result in results:
+        print(result)
+
+    parts = str(results[0]).split(",")
+    print(parts)
+    suggestion = parts[0].lower()
+    corrections_made = int(parts[1])
+
+    return (suggestion, corrections_made)
+
 def validate_education(body):
     """ Return if education object is valid and if it's not what response and error code should be returned"""
     required_fields = ['course', 'school', 'start_date', 'grade', 'logo']
@@ -122,5 +164,5 @@ def validate_education(body):
     if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
         return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
     if not validate_request(body, required_fields):
-        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400    
+        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400
     return True, None, None

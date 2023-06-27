@@ -5,8 +5,9 @@ import phonenumbers
 from flask import Flask, jsonify, request
 
 from models import Education, Experience, Skill, User
-from utils import (validate_date_string, validate_grade, validate_proficiency,
-                   validate_request, validate_education)
+from utils import (check_for_suggestion, validate_date_string,
+                   validate_education, validate_grade, validate_proficiency,
+                   validate_request)
 
 app = Flask(__name__)
 # Validation of required fields
@@ -346,3 +347,69 @@ def validate_phone(phone):
         return True
     except phonenumbers.NumberParseException:
         return False
+
+@app.route('/check-spelling', methods=['POST'])
+def check_spelling() -> list[dict[str, str]]:
+    """
+    Check spelling of the content for a specific section and provide suggestions.
+
+    Payload:
+        {
+            "section": "experience",
+            "content": "Hellq there"
+        }
+        section (str): The section to perform spelling check on (e.g., 'Experience', 'Education', 'Skill').
+        content (str): The user input to check for spelling errors.
+
+    Returns:
+        List[Dict[str, str]]: A list of dictionaries containing spelling suggestions. Each dictionary has two keys:
+                              'before' (str) - The original word in the content, and
+                              'after' (str) - The suggested corrected word.
+
+    Example:
+        section = 'Experience'
+        content = 'Hellq there'
+        suggestions = check_spelling(section, content)
+        for suggestion in suggestions:
+            print(f"Before: {suggestion['before']}, After: {suggestion['after']}")
+    """
+    corrections_body = {}
+    response_body = {}
+    section = request.json.get('section')  # Get the section name from the request payload
+    content = request.json.get('content')  # Get the user input from the request payload
+
+    section = str(section).lower()
+
+    # Perform spelling check based on the section
+    if section == 'experience':
+        # Check the spelling of title and description, provide suggestions if needed
+        # Add the suggestions to the `suggestions` list
+        pass
+    elif section == 'education':
+        # Check the spelling of course, provide suggestions if needed
+        # Add the suggestions to the `suggestions` list
+        pass
+    elif section == 'skill':
+        # Check the spelling of name, provide suggestions if needed
+        suggestion, num_of_corrections = check_for_suggestion(str(content))
+        print(f"The suggestions are: {suggestion}")
+        print(f"The number of corrections made is: {num_of_corrections}")
+        # Add the suggestions to the `suggestions` list
+        if num_of_corrections > 0:
+            #suggestions.append(suggestion)
+            corrections_body = {
+                "before": str(content),
+                "after": suggestion,
+            }
+            response_body = {
+                'message':'We have a suggestion',
+                'suggestions':corrections_body,
+                'num_of_corrections_made':num_of_corrections,
+            }
+        else:
+            response_body = {
+                'message':'We do not any suggestion',
+                'suggestions':corrections_body,
+                'num_of_corrections_made':num_of_corrections,
+            }
+    return jsonify(response_body), 200
