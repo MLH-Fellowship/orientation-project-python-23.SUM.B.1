@@ -2,13 +2,19 @@
 Flask Application
 '''
 import phonenumbers
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
+import crud
+from database_model import connect_to_db, db
 
 from models import Education, Experience, Skill, User
 from utils import (validate_date_string, validate_grade, validate_proficiency,
                    validate_request, validate_education)
 
+
 app = Flask(__name__)
+
+
+
 # Validation of required fields
 data = {
     "experience": [
@@ -128,9 +134,26 @@ def education(index=None):
         if not is_valid:
             return result_response, code           
 
-        data['education'].append(body)
-        new_education_index = len(data["education"])
-        return jsonify({"id": new_education_index}), 201    
+        # save it to the database instead
+        course = request.body.get("course")
+        school = request.body.get("school")
+        start_date = request.body.get("start_date")
+        end_date = request.body.get("end_date")
+        grade = request.body.get("grade")
+        logo = request.body.get("logo")
+
+        new_education = crud.create_education(course, school, start_date, end_date, grade, logo)
+        db.session.add(new_education)
+        db.session.commit()
+
+        new_education_id = new_education.id
+        print(new_education_id)
+        # new_education_id = crud.get_education_by_id(new_education.id)
+        return jsonify({"id": new_education_id})
+
+        # data['education'].append(body)
+        # new_education_index = len(data["education"])
+        # return jsonify({"id": new_education_index}), 201    
     
     if request.method == 'PUT':
         if index:
