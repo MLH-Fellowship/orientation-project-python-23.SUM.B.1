@@ -1,12 +1,11 @@
 '''
 Flask Application
 '''
-import phonenumbers
 from flask import Flask, jsonify, request
 
 from models import Education, Experience, Skill, User
-from utils import (validate_date_string, validate_grade, validate_proficiency,
-                   validate_request, validate_education)
+from utils import (validate_date_string, validate_proficiency,
+                   validate_request, validate_education, validate_experience)
 
 app = Flask(__name__)
 # Validation of required fields
@@ -58,7 +57,7 @@ def hello_world():
     return jsonify({"message": "Hello, World!"})
 
 @app.route('/resume/experience', methods=['GET', 'POST'])
-@app.route('/resume/experience/<index>', methods=['GET', 'POST','DELETE','pUT'])
+@app.route('/resume/experience/<index>', methods=['GET', 'POST','DELETE','PUT'])
 def experience(index = None):
     '''
     Handle experience requests
@@ -79,13 +78,9 @@ def experience(index = None):
     if request.method == 'POST':
          # Request validation Start
         body = request.json
-        required_fields = ['title', 'company', 'start_date', 'description', 'logo']
-        if body.get('start_date') and not validate_date_string(body.get('start_date')):
-            return jsonify({"error": "Invalid start date. The format should be `June 2023`"}), 400
-        if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-            return jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
-        if not validate_request(body, required_fields):
-            return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
+        is_valid, result_response, code = validate_experience(body)
+        if not is_valid:
+            return result_response, code
         # Request validation End
 
         # Extract the required attributes from the data
@@ -106,10 +101,10 @@ def experience(index = None):
             }), 201
     if request.method == 'DELETE':
         if index and str(index).isnumeric():
-                expId = int(index)
-                if 1 <= expId <= len(data['experience']):
-                    data['experience'].pop((expId - 1))
-                    return jsonify({"message":f"Experience with id {expId} has been successfully deleted"}), 200
+                exp_id = int(index)
+                if 1 <= exp_id <= len(data['experience']):
+                    data['experience'].pop((exp_id - 1))
+                    return jsonify({"message":f"Experience with id {exp_id} has been successfully deleted"}), 200
                 else:
                     return jsonify({"error": "Invalid experience id"}), 400
                 
@@ -121,23 +116,17 @@ def experience(index = None):
             exp_id = int(index)
             body = request.json
 
-            # Find the experience to edit
-            experience = None
-
             # Request validation
-            required_fields = ['title', 'company', 'start_date', 'description', 'logo']
-            if body.get('start_date') and not validate_date_string(body.get('start_date')):
-                return jsonify({"error": "Invalid start date. The format should be `June 2023`"}), 400
-            if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-                return jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
-            if not validate_request(body, required_fields):
-                return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
+            body = request.json
+            is_valid, result_response, code = validate_experience(body)
+            if not is_valid:
+                return result_response, code
             # Request validation End
 
             if 1 <= exp_id <= len(data['experience']):
                     data['experience'][exp_id-1] = body
                     return jsonify({
-                    "message": f"Experience with id {exp_id} was successfully updated",
+                    "message": f"Experience with id {exp_id} has been successfully updated",
                     "Updated data": data['experience'][exp_id-1]
                     }), 201
             else:
@@ -145,7 +134,7 @@ def experience(index = None):
         else:
             return jsonify({"error": "Invalid experience ID"}), 400
 
-    return jsonify({})
+    return jsonify({'message':'Something went wrong'}), 500
 
 
 

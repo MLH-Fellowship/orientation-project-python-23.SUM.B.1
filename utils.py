@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any
-
+from flask import jsonify
 
 def validate_date_string(date_string: str) -> bool:
     """
@@ -123,4 +123,21 @@ def validate_education(body):
         return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
     if not validate_request(body, required_fields):
         return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400    
+    return True, None, None
+
+def validate_experience(body):
+    """Validate an experience object and return if it's valid.
+    Returns:
+        tuple: A tuple containing a boolean value indicating if the experience object is valid,
+               a JSON response object with an error message if the object is invalid,
+               and an HTTP status code (400) indicating a bad request.
+    """
+
+    required_fields = ['title', 'company', 'start_date', 'description', 'logo']
+    if body.get('start_date') and not validate_date_string(body.get('start_date')):
+        return False, jsonify({"error": "Invalid start date. The format should be `June 2023`"}), 400
+    if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
+        return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
+    if not validate_request(body, required_fields):
+        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400
     return True, None, None

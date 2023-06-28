@@ -105,10 +105,10 @@ def test_edit_experience():
         },
     )
                                      
-     # Assert the response status code is 200 (OK)
+     # Assert the response status code is 201
     assert response.status_code == 201
 
-    assert response.json["message"] == "Experience with id 1 was successfully updated"
+    assert response.json["message"] == "Experience with id 1 has been successfully updated"
 
 def test_delete_experience():
     """ Test deleting a education"""    
@@ -117,7 +117,7 @@ def test_delete_experience():
      # Assert the response status code is 200 (OK)
     assert response.status_code == 200
 
-    assert response.json["message"] == "Experience with ID 1 has been successfully deleted"
+    assert response.json["message"] == "Experience with id 1 has been successfully deleted"
 
 
 def test_add_education():
