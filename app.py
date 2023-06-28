@@ -4,13 +4,12 @@ Flask Application
 
 import ast
 import phonenumbers
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from models import Education, Experience, Skill, User
 from utils import (check_for_suggestion, validate_date_string,
-                   validate_education, validate_grade, validate_proficiency,
+                   validate_education, validate_grade, validate_proficiency, validate_experience,
                    validate_request, process_sugesstion, is_invalid_content)
 
 app = Flask(__name__)
@@ -64,7 +63,7 @@ def hello_world():
     return jsonify({"message": "Hello, World!"})
 
 @app.route('/resume/experience', methods=['GET', 'POST'])
-@app.route('/resume/experience/<index>', methods=['GET', 'POST'])
+@app.route('/resume/experience/<index>', methods=['GET', 'POST','DELETE','PUT'])
 def experience(index = None):
     '''
     Handle experience requests
@@ -76,22 +75,18 @@ def experience(index = None):
                 if 1 <= exp_id <= len(data['experience']):
                     return jsonify(data['experience'][exp_id-1]), 200
                 else:
-                    return jsonify({"message": "Invalid experience ID"}), 400
+                    return jsonify({"message": "Invalid experience ID"}), 404
             else:
-                return jsonify({"message": "Invalid experience ID"}), 400
+                return jsonify({"message": "Invalid experience ID"}), 404
         else:
-            return jsonify(data['experience']), 200
+            return jsonify(data['experience']), 201
 
     if request.method == 'POST':
          # Request validation Start
         body = request.json
-        required_fields = ['title', 'company', 'start_date', 'description', 'logo']
-        if body.get('start_date') and not validate_date_string(body.get('start_date')):
-            return jsonify({"error": "Invalid start date. The format should be `June 2023`"}), 400
-        if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-            return jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
-        if not validate_request(body, required_fields):
-            return jsonify({"error": "Invalid request. Required attributes are missing"}), 400
+        is_valid, result_response, code = validate_experience(body)
+        if not is_valid:
+            return result_response, code
         # Request validation End
 
         # Extract the required attributes from the data
@@ -110,7 +105,42 @@ def experience(index = None):
             "message": "New experience successfully created",
             "id": len(data['experience']) -1
             }), 201
-    return jsonify({})
+    if request.method == 'DELETE':
+        if index and str(index).isnumeric():
+            exp_id = int(index)
+            if 1 <= exp_id <= len(data['experience']):
+                data['experience'].pop((exp_id - 1))
+                return jsonify({"message":f"Experience with id {exp_id} has been successfully deleted"}), 200
+            else:
+                return jsonify({"error": "Invalid experience id"}), 400
+                
+        else:
+            return jsonify({"error": "Invalid experience id"}), 400
+
+    if request.method == 'PUT':
+        if index and str(index).isnumeric():
+            exp_id = int(index)
+            body = request.json
+
+            # Request validation
+            body = request.json
+            is_valid, result_response, code = validate_experience(body)
+            if not is_valid:
+                return result_response, code
+            # Request validation End
+
+            if 1 <= exp_id <= len(data['experience']):
+                data['experience'][exp_id-1] = body
+                return jsonify({
+                "message": f"Experience with id {exp_id} has been successfully updated",
+                "Updated data": data['experience'][exp_id-1]
+                }), 201
+            else:
+                return jsonify({"error": f"Experience with id {exp_id} not found"}), 404
+        else:
+            return jsonify({"error": "Invalid experience ID"}), 400
+
+    return jsonify({'message':'Something went wrong'}), 500
 
 
 
