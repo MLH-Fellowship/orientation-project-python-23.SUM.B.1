@@ -269,3 +269,29 @@ def test_edit_user():
     assert response.json["body"]["phone"] == "+12124567892"
     assert response.json["body"]["email"] == "janedoe@example.com"
     assert response.json["body"]["resume_order"] == "[2, 1, 3]"
+
+def test_spelling_suggestion():
+    """
+    Test the spelling suggestion functionality.
+
+    This function can be used to verify the correctness and effectiveness of the spelling suggestion feature.
+
+    Example usage:
+        test_spelling_suggestion()
+    """
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['softwar', 'enginerr']", "section": "experience"},
+    )
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We have a suggestion"
+
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['ball', 'hello']", "section": "experience"},
+    )
+
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We do not any suggestion"
