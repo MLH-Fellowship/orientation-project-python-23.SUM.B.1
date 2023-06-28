@@ -104,8 +104,7 @@ def test_edit_experience():
             "logo": "example-logo.png",
         },
     )
-                                     
-     # Assert the response status code is 201
+    # Assert the response status code is 201
     assert response.status_code == 201
 
     assert response.json["message"] == "Experience with id 1 has been successfully updated"
@@ -145,7 +144,6 @@ def test_delete_education():
 
     result = app.test_client().delete('/resume/education/1').json['message']
     assert result == "Education Computer Science successfully deleted"
-    
 
 
 def test_edit_education():
@@ -165,8 +163,8 @@ def test_edit_education():
     result = response.json
     assert result['id'] == 1
     assert response.status_code == 200
-    
-   
+
+
 def test_add_education_via_put_request():
     """Test to check if put method add existent education works properly"""
 
@@ -182,10 +180,8 @@ def test_add_education_via_put_request():
         },
     )
     result = response.json
-    assert result['id'] == 4 
+    assert result['id'] == 4
     assert response.status_code == 201
-    
-
 
 def test_add_skill():
     """
@@ -298,3 +294,29 @@ def test_edit_user():
     assert response.json["body"]["phone"] == "+12124567892"
     assert response.json["body"]["email"] == "janedoe@example.com"
     assert response.json["body"]["resume_order"] == "[2, 1, 3]"
+
+def test_spelling_suggestion():
+    """
+    Test the spelling suggestion functionality.
+
+    This function can be used to verify the correctness and effectiveness of the spelling suggestion feature.
+
+    Example usage:
+        test_spelling_suggestion()
+    """
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['softwar', 'enginerr']", "section": "experience"},
+    )
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We have a suggestion"
+
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['ball', 'hello']", "section": "experience"},
+    )
+
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We do not any suggestion"

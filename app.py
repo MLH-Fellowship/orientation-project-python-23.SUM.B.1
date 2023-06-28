@@ -1,13 +1,20 @@
 '''
 Flask Application
 '''
-from flask import Flask, jsonify, request
+
+import ast
+
 import phonenumbers
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+
 from models import Education, Experience, Skill, User
-from utils import (validate_date_string, validate_proficiency,
-                   validate_request, validate_education, validate_experience)
+from utils import (is_invalid_content, process_sugesstion, validate_education,
+                   validate_experience, validate_proficiency,
+                   validate_request)
 
 app = Flask(__name__)
+CORS(app)  # Initialize CORS
 # Validation of required fields
 data = {
     "experience": [
@@ -93,7 +100,6 @@ def experience(index = None):
 
         # Create a new instance of the Experience class
         new_experience = Experience(title, company, start_date, end_date, description, logo)
-        
         data['experience'].append(new_experience)
         return jsonify({
             "message": "New experience successfully created",
@@ -101,12 +107,12 @@ def experience(index = None):
             }), 201
     if request.method == 'DELETE':
         if index and str(index).isnumeric():
-                exp_id = int(index)
-                if 1 <= exp_id <= len(data['experience']):
-                    data['experience'].pop((exp_id - 1))
-                    return jsonify({"message":f"Experience with id {exp_id} has been successfully deleted"}), 200
-                else:
-                    return jsonify({"error": "Invalid experience id"}), 400
+            exp_id = int(index)
+            if 1 <= exp_id <= len(data['experience']):
+                data['experience'].pop((exp_id - 1))
+                return jsonify({"message":f"Experience with id {exp_id} has been successfully deleted"}), 200
+            else:
+                return jsonify({"error": "Invalid experience id"}), 400
                 
         else:
             return jsonify({"error": "Invalid experience id"}), 400
@@ -124,11 +130,11 @@ def experience(index = None):
             # Request validation End
 
             if 1 <= exp_id <= len(data['experience']):
-                    data['experience'][exp_id-1] = body
-                    return jsonify({
-                    "message": f"Experience with id {exp_id} has been successfully updated",
-                    "Updated data": data['experience'][exp_id-1]
-                    }), 201
+                data['experience'][exp_id-1] = body
+                return jsonify({
+                "message": f"Experience with id {exp_id} has been successfully updated",
+                "Updated data": data['experience'][exp_id-1]
+                }), 201
             else:
                 return jsonify({"error": f"Experience with id {exp_id} not found"}), 404
         else:
@@ -164,22 +170,22 @@ def education(index=None):
     
     if request.method == 'PUT':
         if index:
-            id = int(index) -1
+            edu_id = int(index) -1
             body = request.json
             is_valid, result_response, code = validate_education(body)
             if not is_valid:
-                return result_response, code 
-            if id < len(data['education']):                                          
-                data['education'][id] = body                
-                return jsonify({'id': id + 1}), 200   
+                return result_response, code
+            if edu_id < len(data['education']):                                  
+                data['education'][edu_id] = body                
+                return jsonify({'id': edu_id + 1}), 200   
             else:                 
                 data['education'].append(body)
                 new_education_id = len(data["education"])
                 return jsonify({"id": new_education_id}), 201   
 
     if request.method == 'DELETE':
-        id = int(index)        
-        deleted_education = data['education'].pop((id - 1))        
+        edu_id = int(index)        
+        deleted_education = data['education'].pop((edu_id - 1))        
         return jsonify({'message':f'Education {deleted_education.course} successfully deleted'})    
 
     return jsonify({"message":"Error: Not correct education index"})
@@ -376,3 +382,34 @@ def validate_phone(phone):
         return True
     except phonenumbers.NumberParseException:
         return False
+
+@app.route('/check-spelling', methods=['POST'])
+def check_spelling() -> dict:
+    """
+    Check spelling of the content and provide suggestions.
+
+    Payload:
+        {
+            "content": "Hellq there"
+        }
+        content (str): The user input to check for spelling errors.
+
+    Returns:
+        Response: A JSON response containing a list of dictionaries. Each dictionary has two keys:
+        - 'before' (str): The original word in the content.
+        - 'after' (str): The suggested corrected word.
+
+    """
+    response_body = {}
+    corrections  = []
+   
+    content = request.json.get('content')  # Get the user input from the request payload
+
+    if is_invalid_content(content):
+        return jsonify({'message':'Please pass in the right format for content.'}), 400
+
+    contents = ast.literal_eval(content)
+
+    # Perform spelling check based on the section
+    response_body = process_sugesstion(words=contents, corrections=corrections)
+    return jsonify(response_body), 200
