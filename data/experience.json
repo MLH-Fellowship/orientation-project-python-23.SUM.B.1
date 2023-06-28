@@ -1,0 +1,10 @@
+[
+    {
+        "title": "Software Developer",
+        "company": "A Cool Company",
+        "start_date": "October 2022",
+        "end_date": "Present",
+        "description": "Writing Python Code",
+        "logo": "example-logo.png"
+    }
+]

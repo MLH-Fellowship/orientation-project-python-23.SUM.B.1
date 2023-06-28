@@ -1,0 +1,10 @@
+[
+    {
+        "course":"Computer Science",
+        "school": "University of Tech",
+        "start_date":"September 2019",
+        "end_date":"July 2022",
+        "grade":"A+",
+        "logo": "example-logo.png"
+    }
+]
