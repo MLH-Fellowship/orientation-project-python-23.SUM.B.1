@@ -166,3 +166,66 @@ def validate_education(body):
     if not validate_request(body, required_fields):
         return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400
     return True, None, None
+
+def process_sugesstion(words:list[str], corrections: list[dict[str, str]]) -> dict[str, Any]:
+    """
+    Process spelling suggestions for a list of words.
+
+    Args:
+        words (list[str]): The list of words to check for spelling suggestions.
+        corrections (list[dict[str, str]]): The list to store the spelling corrections.
+
+    Returns:
+        dict[str, Any]: A dictionary containing information about the spelling suggestions.
+            - 'message' (str): A message indicating whether suggestions are available.
+            - 'suggestions' (list[dict[str, str]]): A list of dictionaries containing spelling suggestions.
+                Each dictionary has two keys:
+                - 'before' (str): The original word in the content.
+                - 'after' (str): The suggested corrected word.
+            - 'num_of_corrections_made' (int): The total number of spelling corrections made.
+    """
+    response_body = {}
+    for word in words:
+        suggestion, num_of_corrections = check_for_suggestion(word)
+        print(f"The suggestions are: {suggestion}")
+        print(f"The number of corrections made is: {num_of_corrections}")
+        # Add the suggestions to the `suggestions` list
+        if num_of_corrections > 0:
+            #suggestions.append(suggestion)
+            corrections_body = {
+                "before": word,
+                "after": suggestion,
+            }
+            corrections.append(corrections_body)
+            response_body = {
+                'message':'We have a suggestion',
+                'suggestions':corrections,
+                'num_of_corrections_made':len(corrections),
+            }
+        else:
+            response_body = {
+                'message':'We do not any suggestion',
+                'suggestions':corrections,
+                'num_of_corrections_made':len(corrections),
+            }
+
+    return response_body
+
+def is_invalid_content(value: str) -> bool:
+    """
+    Check if the value is a valid content format.
+
+    Args:
+        value (str): The value to check.
+
+    Returns:
+        bool: True if the value is an invalid content format, False otherwise.
+
+    Example:
+        value = "['Ballr', 'Hellq']"
+        is_invalid = is_invalid_content(value)
+        print(is_invalid)
+    """
+    if ('[' not in str(value)) or (']' not in str(value)):
+        return True
+    return False

@@ -1,15 +1,20 @@
 '''
 Flask Application
 '''
+
+import ast
 import phonenumbers
+
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from models import Education, Experience, Skill, User
 from utils import (check_for_suggestion, validate_date_string,
                    validate_education, validate_grade, validate_proficiency,
-                   validate_request)
+                   validate_request, process_sugesstion, is_invalid_content)
 
 app = Flask(__name__)
+CORS(app)  # Initialize CORS
 # Validation of required fields
 data = {
     "experience": [
@@ -349,7 +354,7 @@ def validate_phone(phone):
         return False
 
 @app.route('/check-spelling', methods=['POST'])
-def check_spelling() -> list[dict[str, str]]:
+def check_spelling() -> dict:
     """
     Check spelling of the content for a specific section and provide suggestions.
 
@@ -362,54 +367,33 @@ def check_spelling() -> list[dict[str, str]]:
         content (str): The user input to check for spelling errors.
 
     Returns:
-        List[Dict[str, str]]: A list of dictionaries containing spelling suggestions. Each dictionary has two keys:
-                              'before' (str) - The original word in the content, and
-                              'after' (str) - The suggested corrected word.
+        Response: A JSON response containing a list of dictionaries. Each dictionary has two keys:
+        - 'before' (str): The original word in the content.
+        - 'after' (str): The suggested corrected word.
 
-    Example:
-        section = 'Experience'
-        content = 'Hellq there'
-        suggestions = check_spelling(section, content)
-        for suggestion in suggestions:
-            print(f"Before: {suggestion['before']}, After: {suggestion['after']}")
     """
-    corrections_body = {}
     response_body = {}
+    corrections  = []
     section = request.json.get('section')  # Get the section name from the request payload
     content = request.json.get('content')  # Get the user input from the request payload
 
     section = str(section).lower()
 
+    if is_invalid_content(content):
+        return jsonify({'message':'Please pass in the right format for content.'}), 400
+
+    contents = ast.literal_eval(content)
+
     # Perform spelling check based on the section
     if section == 'experience':
         # Check the spelling of title and description, provide suggestions if needed
-        # Add the suggestions to the `suggestions` list
-        pass
+        response_body = process_sugesstion(words=contents, corrections=corrections)
     elif section == 'education':
         # Check the spelling of course, provide suggestions if needed
-        # Add the suggestions to the `suggestions` list
-        pass
+        response_body = process_sugesstion(words=contents, corrections=corrections)
     elif section == 'skill':
-        # Check the spelling of name, provide suggestions if needed
-        suggestion, num_of_corrections = check_for_suggestion(str(content))
-        print(f"The suggestions are: {suggestion}")
-        print(f"The number of corrections made is: {num_of_corrections}")
-        # Add the suggestions to the `suggestions` list
-        if num_of_corrections > 0:
-            #suggestions.append(suggestion)
-            corrections_body = {
-                "before": str(content),
-                "after": suggestion,
-            }
-            response_body = {
-                'message':'We have a suggestion',
-                'suggestions':corrections_body,
-                'num_of_corrections_made':num_of_corrections,
-            }
-        else:
-            response_body = {
-                'message':'We do not any suggestion',
-                'suggestions':corrections_body,
-                'num_of_corrections_made':num_of_corrections,
-            }
+        # Check the spelling of name, provide suggestions if needed   
+        response_body = process_sugesstion(words=contents, corrections=corrections)
+    else:
+        return jsonify({'message':'The section specified does not exist'}), 400
     return jsonify(response_body), 200
