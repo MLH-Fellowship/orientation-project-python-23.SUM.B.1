@@ -90,6 +90,34 @@ def test_add_experience():
     print(response.json)
     assert response.status_code == 201
 
+def test_edit_experience():
+    """ Test deleting a education"""    
+
+    response = app.test_client().put(
+        "/resume/experience/1",
+        json={
+            "title": "Senior Software Developer",
+            "company": "A very Cool Company",
+            "start_date": "October 2022",
+            "end_date": "October 2024",
+            "description": "Writing Python Code",
+            "logo": "example-logo.png",
+        },
+    )
+    # Assert the response status code is 201
+    assert response.status_code == 201
+
+    assert response.json["message"] == "Experience with id 1 has been successfully updated"
+
+def test_delete_experience():
+    """ Test deleting a education"""    
+
+    response = app.test_client().delete('/resume/experience/1')
+     # Assert the response status code is 200 (OK)
+    assert response.status_code == 200
+
+    assert response.json["message"] == "Experience with id 1 has been successfully deleted"
+
 
 def test_add_education():
     """
@@ -134,8 +162,8 @@ def test_edit_education():
     result = response.json
     assert result['id'] == 1
     assert response.status_code == 200
-    
-   
+
+
 def test_add_education_via_put_request():
     """Test to check if put method add existent education works properly"""
 
@@ -151,10 +179,8 @@ def test_add_education_via_put_request():
         },
     )
     result = response.json
-    assert result['id'] == 4 
+    assert result['id'] == 4
     assert response.status_code == 201
-    
-
 
 def test_add_skill():
     """
@@ -270,3 +296,29 @@ def test_edit_user():
     assert response.json["body"]["phone"] == "+12124567892"
     assert response.json["body"]["email"] == "janedoe@example.com"
     assert response.json["body"]["resume_order"] == "[2, 1, 3]"
+
+def test_spelling_suggestion():
+    """
+    Test the spelling suggestion functionality.
+
+    This function can be used to verify the correctness and effectiveness of the spelling suggestion feature.
+
+    Example usage:
+        test_spelling_suggestion()
+    """
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['softwar', 'enginerr']", "section": "experience"},
+    )
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We have a suggestion"
+
+    response = app.test_client().post(
+        "/check-spelling",
+        json={"content": "['ball', 'hello']", "section": "experience"},
+    )
+
+    assert response.status_code == 200
+    # Check if suggestions were made as we have mistakes
+    assert response.json["message"] == "We do not any suggestion"
