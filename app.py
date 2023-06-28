@@ -3,14 +3,15 @@ Flask Application
 '''
 
 import ast
+
 import phonenumbers
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from models import Education, Experience, Skill, User
-from utils import (check_for_suggestion, validate_date_string,
-                   validate_education, validate_grade, validate_proficiency, validate_experience,
-                   validate_request, process_sugesstion, is_invalid_content)
+from utils import (is_invalid_content, process_sugesstion, validate_education,
+                   validate_experience, validate_proficiency,
+                   validate_request)
 
 app = Flask(__name__)
 CORS(app)  # Initialize CORS
@@ -99,7 +100,6 @@ def experience(index = None):
 
         # Create a new instance of the Experience class
         new_experience = Experience(title, company, start_date, end_date, description, logo)
-        
         data['experience'].append(new_experience)
         return jsonify({
             "message": "New experience successfully created",
@@ -170,22 +170,22 @@ def education(index=None):
     
     if request.method == 'PUT':
         if index:
-            id = int(index) -1
+            edu_id = int(index) -1
             body = request.json
             is_valid, result_response, code = validate_education(body)
             if not is_valid:
-                return result_response, code 
-            if id < len(data['education']):                                          
-                data['education'][id] = body                
-                return jsonify({'id': id + 1}), 200   
+                return result_response, code
+            if edu_id < len(data['education']):                                  
+                data['education'][edu_id] = body                
+                return jsonify({'id': edu_id + 1}), 200   
             else:                 
                 data['education'].append(body)
                 new_education_id = len(data["education"])
                 return jsonify({"id": new_education_id}), 201   
 
     if request.method == 'DELETE':
-        id = int(index)        
-        deleted_education = data['education'].pop((id - 1))        
+        edu_id = int(index)        
+        deleted_education = data['education'].pop((edu_id - 1))        
         return jsonify({'message':f'Education {deleted_education.course} successfully deleted'})    
 
     return jsonify({"message":"Error: Not correct education index"})
@@ -386,14 +386,12 @@ def validate_phone(phone):
 @app.route('/check-spelling', methods=['POST'])
 def check_spelling() -> dict:
     """
-    Check spelling of the content for a specific section and provide suggestions.
+    Check spelling of the content and provide suggestions.
 
     Payload:
         {
-            "section": "experience",
             "content": "Hellq there"
         }
-        section (str): The section to perform spelling check on (e.g., 'Experience', 'Education', 'Skill').
         content (str): The user input to check for spelling errors.
 
     Returns:
@@ -404,10 +402,8 @@ def check_spelling() -> dict:
     """
     response_body = {}
     corrections  = []
-    section = request.json.get('section')  # Get the section name from the request payload
+   
     content = request.json.get('content')  # Get the user input from the request payload
-
-    section = str(section).lower()
 
     if is_invalid_content(content):
         return jsonify({'message':'Please pass in the right format for content.'}), 400
@@ -415,15 +411,5 @@ def check_spelling() -> dict:
     contents = ast.literal_eval(content)
 
     # Perform spelling check based on the section
-    if section == 'experience':
-        # Check the spelling of title and description, provide suggestions if needed
-        response_body = process_sugesstion(words=contents, corrections=corrections)
-    elif section == 'education':
-        # Check the spelling of course, provide suggestions if needed
-        response_body = process_sugesstion(words=contents, corrections=corrections)
-    elif section == 'skill':
-        # Check the spelling of name, provide suggestions if needed   
-        response_body = process_sugesstion(words=contents, corrections=corrections)
-    else:
-        return jsonify({'message':'The section specified does not exist'}), 400
+    response_body = process_sugesstion(words=contents, corrections=corrections)
     return jsonify(response_body), 200

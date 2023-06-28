@@ -104,8 +104,7 @@ def test_edit_experience():
             "logo": "example-logo.png",
         },
     )
-                                     
-     # Assert the response status code is 201
+    # Assert the response status code is 201
     assert response.status_code == 201
 
     assert response.json["message"] == "Experience with id 1 has been successfully updated"
@@ -145,7 +144,6 @@ def test_delete_education():
 
     result = app.test_client().delete('/resume/education/1').json['message']
     assert result == "Education Computer Science successfully deleted"
-    
 
 
 def test_edit_education():
@@ -165,8 +163,8 @@ def test_edit_education():
     result = response.json
     assert result['id'] == 1
     assert response.status_code == 200
-    
-   
+
+
 def test_add_education_via_put_request():
     """Test to check if put method add existent education works properly"""
 
@@ -182,10 +180,8 @@ def test_add_education_via_put_request():
         },
     )
     result = response.json
-    assert result['id'] == 4 
+    assert result['id'] == 4
     assert response.status_code == 201
-    
-
 
 def test_add_skill():
     """
