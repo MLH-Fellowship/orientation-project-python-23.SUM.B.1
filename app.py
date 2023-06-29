@@ -33,17 +33,19 @@ data = {
                   "A+",
                   "example-logo.png"),
         Education("Computer Science",
-                  "Harvard", 
-                  "October 2019", 
-                  "June 2024", 
-                  "B-", 
+                  "Harvard",
+                  "October 2019",
+                  "June 2024",
+                  "70%",
+                  "example-logo.png"),
+        Education("Cybersecurity", "University of florida",   "August 2016",  "January 2022",      "90%",
                   "example-logo.png"),
         Education("Cybersecurity",
-                  "University of florida", 
-                  "August 2016", 
-                  "January 2022", 
-                  "C+", 
-                  "example-logo.png")            
+                  "University of florida",
+                  "August 2016",
+                  "January 2022",
+                  "C+",
+                  "example-logo.png")
 
     ],
     "skill": [
@@ -63,6 +65,7 @@ def hello_world():
     '''
     return jsonify({"message": "Hello, World!"})
 
+
 @app.route('/resume/experience', methods=['GET', 'POST'])
 @app.route('/resume/experience/<index>', methods=['GET', 'POST','DELETE','PUT'])
 def experience(index = None):
@@ -70,17 +73,16 @@ def experience(index = None):
     Handle experience requests
     '''
     if request.method == 'GET':
+        return_data = None
         if index:
             if str(index).isnumeric():
                 exp_id = int(index)
                 if 1 <= exp_id <= len(data['experience']):
-                    return jsonify(data['experience'][exp_id-1]), 200
-                else:
-                    return jsonify({"message": "Invalid experience ID"}), 404
-            else:
-                return jsonify({"message": "Invalid experience ID"}), 404
-        else:
-            return jsonify(data['experience']), 201
+                    return_data = jsonify(data['experience'][exp_id-1]), 200
+                return_data = jsonify(
+                    {"message": "Invalid experience ID"}), 400
+        return_data = jsonify(data['experience']), 200
+        return return_data
 
     if request.method == 'POST':
          # Request validation Start
@@ -147,11 +149,75 @@ def experience(index = None):
 @app.route('/resume/education', methods=['GET', 'POST'])
 @app.route('/resume/education/<index>', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def education(index=None):
-    """ Return a education based on index, return all educations in the list and add new education to the the list"""    
-    if request.method == 'GET' and index is None:
-        return jsonify(data["education"]) 
-    elif request.method == 'GET' and index.isnumeric():        
+    """ Return a education based on index, return all educations in the list and add new education to the the list"""
+    if request.method == 'DELETE' and index is not None and index.isnumeric():
         index_num = int(index)
+        return_data = None
+        if 0 < index_num <= len(data["education"]):
+            del data["education"][index_num - 1]
+            return_data = jsonify("Education deleted successfully"), 200
+        return_data = jsonify(
+            "error: There is no education related to this index")
+        return return_data
+
+    if request.method == 'GET' and index is None:
+        return jsonify(data["education"])
+    if request.method == 'GET' and index is not None and index.isnumeric():
+        index_num = int(index)
+        return_data = None
+        if 0 < index_num <= len(data["education"]):
+            return_data = jsonify(data["education"][index_num - 1])
+        return_data = jsonify(
+            "error: There is no education related to this index")
+        return return_data
+    if request.method == 'POST':
+        # Request validation Start
+        if request.json is not None:
+            body = request.json
+            required_fields = ['course', 'school',
+                               'start_date', 'grade', 'logo']
+            error_response = None
+            if (body.get('grade') and not validate_grade(body.get('grade'))):
+                error_response = {
+                    "error": "Invalid grade. The grade should be like A+ or F"}
+            elif body.get('start_date') and not validate_date_string(body.get('start_date')):
+                error_response = {
+                    "error": "Invalid start date. Format should be `June 2023`"}
+            elif (body.get('end_date') and not validate_date_string(body.get('end_date'))):
+                error_response = {
+                    "error": "Invalid end date. Format should be like `June 2023`"}
+            elif not validate_request(body, required_fields):
+                error_response = {
+                    "error": "Invalid request. Required attributes are missing"}
+            if error_response:
+                return jsonify(error_response), 400
+        # Request validation End
+        return jsonify({}), 201
+    return jsonify("Error: Not correct education index")
+
+
+@app.route('/resume/education', methods=["GET", "POST"])
+def all_education():
+    '''Return all education in a list format'''
+    if request.method == "POST":
+        if request.json is not None:
+            body = request.json
+            error_response = None
+            if (body.get('start_date') and not validate_date_string(body.get('start_date'))):
+                error_response = {
+                    "error": "Invalid start date. Format should be `June 2023`"}
+            elif (body.get('end_date') and not validate_date_string(body.get('end_date'))):
+                error_response = {
+                    "error": "Invalid end date. Format should be like `June 2023`"}
+            elif not validate_request(body, ['course', 'school', 'start_date', 'grade', 'logo']):
+                error_response = {
+                    "error": "Invalid request. Required attributes are missing"}
+            if error_response:
+                return jsonify(error_response), 400
+            return jsonify({}), 201
+    if request.method == "GET":
+        return data["education"]
+    return jsonify({})
         if index_num > 0 and index_num <= len(data["education"]):
             return jsonify(data["education"][index_num - 1])
         else:
@@ -203,14 +269,28 @@ def skill(index=None):
         Flask Response: JSON response containing skill information or an error message.
 
     '''
-    if request.method == 'GET':
+    if request.method == 'DELETE':
+        # handle DELETE request by deleting skill with id=index
         if index:
-            # if user is trying to access a specific skill with skill_id=index
-            skill_id = int(index)
-            if 0 < skill_id <= len(data['skill']):
-                return jsonify(data['skill'][skill_id - 1]), 200
-            return jsonify({'message': f'Skill with ID {skill_id} does not exist'}), 400
-        return jsonify(data['skill']), 200
+            skill_index = int(index)
+            if 0 < skill_index <= len(data['skill']):
+                deleted_item = data['skill'][skill_index - 1]
+                del data['skill'][skill_index - 1]
+                return jsonify({'message': 'Skill deleted successfully', 'status': 'success', 'deleted_item': deleted_item}), 200
+        else:
+            return jsonify({'message': 'Invalid request'}), 400
+
+    if request.method == 'GET':
+        return_data = None
+        if index:
+            # if user is trying to access a specific skill with id=index
+            skill_index = int(index)
+            if 0 < skill_index <= len(data['skill']):
+                return_data = jsonify(data['skill'][skill_index - 1]), 200
+            return_data = jsonify(
+                {'message': f'Skill with ID {skill_index} does not exist'}), 400
+        return_data = jsonify(data['skill']), 200
+        return return_data
 
     if request.method == 'PUT':
         if index:
@@ -248,6 +328,32 @@ def skill(index=None):
 
     if request.method == 'POST':
         # handle POST request by adding skill to data dictionary
+        if request.json is not None:
+            body = request.json
+            required_fields = ['name', 'proficiency', 'logo']
+            error_response = None
+
+            # validate that the body fields has all required fields and proficiency validation
+            if (body.get('proficiency') and not validate_proficiency(body.get('proficiency'))):
+                error_response = jsonify(
+                    {"error": "Invalid proficiency. The proficiency should be like 80%"})
+            if not validate_request(body, required_fields):
+                error_response = jsonify(
+                    {"error": "Invalid request. Required attributes are missing"})
+            if error_response:
+                return error_response, 400
+            skill_object = Skill(
+                body['name'], body['proficiency'], body['logo'])
+
+            data['skill'].append(skill_object)  # add to list
+            index = data['skill'].index(skill_object)
+
+            return jsonify({
+                'id': index,
+                'message': 'Skill created successfully',
+                'body':  data['skill']
+            }), 201
+    return jsonify({'message': 'Something went wrong'}), 500
         body = request.json
         required_fields = ['name', 'proficiency', 'logo']
         # validate that the body fields has all required fields and proficiency validation
