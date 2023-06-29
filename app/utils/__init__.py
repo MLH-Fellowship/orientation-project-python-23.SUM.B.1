@@ -1,8 +1,9 @@
-import pkg_resources
-
-from flask import jsonify
 from datetime import datetime
 from typing import Any
+
+import phonenumbers
+import pkg_resources
+from flask import jsonify
 from symspellpy import SymSpell
 
 
@@ -116,7 +117,7 @@ def validate_grade(grade: str) -> bool:
     ]
 
 
-def check_for_suggestion(value:str) -> tuple[str, int]:
+def check_for_suggestion(value: str) -> tuple[str, int]:
     """
     Check for spelling suggestions using SymSpell.
 
@@ -142,7 +143,9 @@ def check_for_suggestion(value:str) -> tuple[str, int]:
     sym_spell.load_dictionary(dictionary_path, term_index=0, count_index=1)
     sym_spell.load_bigram_dictionary(bigram_path, term_index=0, count_index=2)
 
-    results = sym_spell.lookup_compound(value, max_edit_distance=1, transfer_casing=True)
+    results = sym_spell.lookup_compound(
+        value, max_edit_distance=1, transfer_casing=True
+    )
 
     for result in results:
         print(result)
@@ -154,18 +157,36 @@ def check_for_suggestion(value:str) -> tuple[str, int]:
 
     return (suggestion, corrections_made)
 
+
 def validate_education(body):
-    """ Return if education object is valid and if it's not what response and error code should be returned"""
-    required_fields = ['course', 'school', 'start_date', 'grade', 'logo']
-    if(body.get('grade') and not validate_grade(body.get('grade'))):
-        return False, jsonify({"error": "Invalid grade. The grade should be like A+ or F"}), 400
-    if body.get('start_date') and not validate_date_string(body.get('start_date')):
-        return False, jsonify({"error": "Invalid start date. Format should be `June 2023`"}), 400
-    if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-        return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
+    """Return if education object is valid and if it's not what response and error code should be returned"""
+    required_fields = ["course", "school", "start_date", "grade", "logo"]
+    if body.get("grade") and not validate_grade(body.get("grade")):
+        return (
+            False,
+            jsonify({"error": "Invalid grade. The grade should be like A+ or F"}),
+            400,
+        )
+    if body.get("start_date") and not validate_date_string(body.get("start_date")):
+        return (
+            False,
+            jsonify({"error": "Invalid start date. Format should be `June 2023`"}),
+            400,
+        )
+    if body.get("end_date") and not validate_date_string(body.get("end_date")):
+        return (
+            False,
+            jsonify({"error": "Invalid end date. Format should be like `June 2023`"}),
+            400,
+        )
     if not validate_request(body, required_fields):
-        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400
+        return (
+            False,
+            jsonify({"error": "Invalid request. Required attributes are missing"}),
+            400,
+        )
     return True, None, None
+
 
 def validate_experience(body):
     """Validate an experience object and return if it's valid.
@@ -175,17 +196,31 @@ def validate_experience(body):
                and an HTTP status code (400) indicating a bad request.
     """
 
-    required_fields = ['title', 'company', 'start_date', 'description', 'logo']
-    if body.get('start_date') and not validate_date_string(body.get('start_date')):
-        return False, jsonify({"error": "Invalid start date. The format should be `June 2023`"}), 400
-    if(body.get('end_date') and not validate_date_string(body.get('end_date'))):
-        return False, jsonify({"error": "Invalid end date. Format should be like `June 2023`"}), 400
+    required_fields = ["title", "company", "start_date", "description", "logo"]
+    if body.get("start_date") and not validate_date_string(body.get("start_date")):
+        return (
+            False,
+            jsonify({"error": "Invalid start date. The format should be `June 2023`"}),
+            400,
+        )
+    if body.get("end_date") and not validate_date_string(body.get("end_date")):
+        return (
+            False,
+            jsonify({"error": "Invalid end date. Format should be like `June 2023`"}),
+            400,
+        )
     if not validate_request(body, required_fields):
-        return False, jsonify({"error": "Invalid request. Required attributes are missing"}), 400
+        return (
+            False,
+            jsonify({"error": "Invalid request. Required attributes are missing"}),
+            400,
+        )
     return True, None, None
 
 
-def process_sugesstion(words:list[str], corrections: list[dict[str, str]]) -> dict[str, Any]:
+def process_sugesstion(
+    words: list[str], corrections: list[dict[str, str]]
+) -> dict[str, Any]:
     """
     Process spelling suggestions for a list of words.
 
@@ -209,25 +244,26 @@ def process_sugesstion(words:list[str], corrections: list[dict[str, str]]) -> di
         print(f"The number of corrections made is: {num_of_corrections}")
         # Add the suggestions to the `suggestions` list
         if num_of_corrections > 0:
-            #suggestions.append(suggestion)
+            # suggestions.append(suggestion)
             corrections_body = {
                 "before": word,
                 "after": suggestion,
             }
             corrections.append(corrections_body)
             response_body = {
-                'message':'We have a suggestion',
-                'suggestions':corrections,
-                'num_of_corrections_made':len(corrections),
+                "message": "We have a suggestion",
+                "suggestions": corrections,
+                "num_of_corrections_made": len(corrections),
             }
         else:
             response_body = {
-                'message':'We do not any suggestion',
-                'suggestions':corrections,
-                'num_of_corrections_made':len(corrections),
+                "message": "We do not any suggestion",
+                "suggestions": corrections,
+                "num_of_corrections_made": len(corrections),
             }
 
     return response_body
+
 
 def is_invalid_content(value: str) -> bool:
     """
@@ -244,6 +280,19 @@ def is_invalid_content(value: str) -> bool:
         is_invalid = is_invalid_content(value)
         print(is_invalid)
     """
-    if ('[' not in str(value)) or (']' not in str(value)):
+    if ("[" not in str(value)) or ("]" not in str(value)):
         return True
     return False
+
+
+def validate_phone(phone: str) -> bool:
+    """
+    Validate phone numbers. It ensures that the user is using an international phone number
+    """
+    try:
+        parsed_phone = phonenumbers.parse(phone, None)
+        if not phonenumbers.is_valid_number(parsed_phone):
+            return False
+        return True
+    except phonenumbers.NumberParseException:
+        return False
