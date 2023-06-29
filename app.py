@@ -10,8 +10,7 @@ from flask_cors import CORS
 
 from models import Education, Experience, Skill, User
 from utils import (is_invalid_content, process_sugesstion, validate_education,
-                   validate_experience, validate_proficiency,
-                   validate_request)
+                   validate_experience, validate_proficiency, validate_request)
 
 app = Flask(__name__)
 CORS(app)  # Initialize CORS
