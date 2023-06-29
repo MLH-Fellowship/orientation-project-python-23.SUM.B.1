@@ -59,13 +59,13 @@ poetry remove <package>
 ### Run
 
 ```bash
-flask run
+python main.py
 ```
 
 ### Run Tests
 
 ```bash
-pytest test_pytest.py
+pytest
 ```
 
 ### Run Linter
@@ -78,6 +78,15 @@ pylint *.py
 
 ```bash
 pyright
+```
+
+### Deploy
+
+The server can be found at [http://localhost:5000](http://localhost:5000).
+
+```bash
+docker build -t orientation-project-python .
+docker run -p 5000:5000 orientation-project-python
 ```
 
 ### Contributors

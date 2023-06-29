@@ -69,6 +69,7 @@ class Skill:
     proficiency: str
     logo: str
 
+
 @dataclass
 class User:
     """
@@ -85,9 +86,9 @@ class User:
 
     where 1-> Experience, 2 -> Education,  3 -> Skills
 
-    Example: 
+    Example:
     ```
-    # this means that we have a user with name Jon Doe, with other properties. The `resume_order` is used to specify that 
+    # this means that we have a user with name Jon Doe, with other properties. The `resume_order` is used to specify that
     # this user wants their resume to be represented in a particular order: (Experience, Education, and Skill)
     user = User(name='Jon Doe', phone'+2348050590740', email'jon.doe@example.com', resume_order = '[1, 2, 3]')
     ```
